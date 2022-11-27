@@ -22,5 +22,13 @@ public class Server
     // 3 - client sends either publish, subscribe, unsubscribe or get requests
     // 4 - in case of get, server responds with messagelist otherwise server responds with success or error
     // 5 - loop 3
+    
+    String json = "{\"_class\":\"PublishRequest\", \"identity\":\"Alice\", \"message\":{\"_class\":\"Message\", \"from\":\"Bob\", \"when\":0, \"body\":\"Hello again!\"}}";
+    try 
+    {
+      PublishRequest pr = om.readValue(json, PublishRequest.class);
+      System.out.println(pr.message.body);
+    }
+    catch (JsonProcessingException e) { e.printStackTrace(); }
   }
 }
