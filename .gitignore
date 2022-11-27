@@ -1,0 +1,3 @@
+# gradle cache and build output
+.gradle/
+build/
