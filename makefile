@@ -1,7 +1,7 @@
-default: clean build
+default: clean build # cleans then builds
 
-clean:
+clean: # clean files using gradle wrapper
 	./gradlew clean
 
-build:
-	./gradlew build
+build: # build into an uberjar that includes deps
+	./gradlew shadowJar

@@ -1,14 +1,16 @@
-plugins
+plugins // build plugins
 {
-  id 'java'
+  id 'java' // allows us to build from expected src/main/java/ structure
+  id 'com.github.johnrengelman.shadow' version '7.1.2' // uberjar creation
 }
 
-repositories 
+repositories  // select repositories
 {
-  mavenCentral()
+  gradlePluginPortal() // gradle build plugins
+  mavenCentral() // maven plugins
 }
 
-dependencies 
+dependencies // dependencies for java project
 {
-  implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.1'
+  implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.1' // json mapping and handling
 }
