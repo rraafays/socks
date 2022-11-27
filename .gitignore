@@ -1,3 +1,5 @@
 # gradle cache and build output
 .gradle/
 build/
+# mac database file
+.DS_Store
