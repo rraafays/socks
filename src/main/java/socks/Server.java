@@ -1,22 +1,26 @@
 package socks;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+// jackson json library
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+// objects to map json sent by the client into
+class Message { public String _class; public String from; public int when; public String body; }
+class OpenRequest { public String _class; public String identity; }
+class PublishRequest { public String _class; public String identity; public Message message; }
+class SubscribeRequest { public String _class; public String identity; public String channel; }
+class GetRequest { public String _class; public String identity; public int after; }
 
 public class Server
 {
-  static ObjectMapper mapper = new ObjectMapper();
+  static ObjectMapper om = new ObjectMapper();
 
   public static void main(String[] args)
   {
-    String json = "{\"brand\":\"Porsche\", \"model\":\"Macan\"}";
-    try
-    { 
-      Car car = mapper.readValue(json, Car.class); 
-      System.out.println(car.model);
-    }
-    catch (JsonProcessingException e) { e.printStackTrace(); }
+    // 1 - client sends openrequest identifying the channel to publish on
+    // 2 - server responds with success if it succeedes
+    // 3 - client sends either publish, subscribe, unsubscribe or get requests
+    // 4 - in case of get, server responds with messagelist otherwise server responds with success or error
+    // 5 - loop 3
   }
 }
-
-class Car { public String brand; public String model; }
