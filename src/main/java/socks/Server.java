@@ -1,5 +1,17 @@
 package socks;
 
+// input output library
+import java.io.BufferedReader;
+import java.io.PrintWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+// network library
+import java.net.ServerSocket;
+import java.net.Socket;
+
+// utility library
+import java.util.Scanner;
+
 // jackson json library
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,13 +34,30 @@ public class Server
     // 3 - client sends either publish, subscribe, unsubscribe or get requests
     // 4 - in case of get, server responds with messagelist otherwise server responds with success or error
     // 5 - loop 3
-    
-    String json = "{\"_class\":\"PublishRequest\", \"identity\":\"Alice\", \"message\":{\"_class\":\"Message\", \"from\":\"Bob\", \"when\":0, \"body\":\"Hello again!\"}}";
+
+
+    final int PORT = 12345;
+    ServerSocket ss;
+    Socket s;
+    BufferedReader i;
+    PrintWriter o;
+    Scanner sc = new Scanner(System.in);
+
     try 
-    {
-      PublishRequest pr = om.readValue(json, PublishRequest.class);
-      System.out.println(pr.message.body);
+    { 
+      ss = new ServerSocket(PORT); 
+      s = ss.accept();
+      o = new PrintWriter(s.getOutputStream());
+      i = new BufferedReader(new InputStreamReader(s.getInputStream()));
     }
-    catch (JsonProcessingException e) { e.printStackTrace(); }
+    catch (IOException e) { e.printStackTrace(); }
+
+    Thread sender = new Thread(new Runnable()
+    {
+      while(true)
+      {
+        
+      }
+    });
   }
 }
