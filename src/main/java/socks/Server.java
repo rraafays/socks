@@ -72,12 +72,22 @@ public class Server
         {
           try
           {
-            
+            json = i.readLine();
+            while(json != null)
+            {
+              System.out.println(json);
+              json = i.readLine();
+            }
+            System.out.println("Client disconnected");
+            o.close();
+            s.close();
+            ss.close();
           }
-          catch
+          catch (IOException e) { e.printStackTrace(); }
         }
       });
       sender.start(); // starts the sender
+      listener.start(); // starts the listener
     }
     catch (IOException e) { e.printStackTrace(); } // if any input output errors occour, print them
 
