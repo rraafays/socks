@@ -49,13 +49,13 @@ public class Server
       out = new PrintWriter(socket.getOutputStream()); // create print writer from client output stream
       in = new BufferedReader(new InputStreamReader(socket.getInputStream())); // create buffered reader from client input stream
 
-      Thread sender = new Thread(new Runnable() 
+      Thread sender = new Thread(new Runnable() // thread to interpret send json to clients
       {
         String json; // variable that will contain data written by client
         @Override // override the run method
         public void run()
         {
-          while(true)
+          while(true) // infinite while loop
           {
             json = scanner.nextLine(); // reads data from client terminal
             out.println(json); // write data stored in msg
@@ -64,26 +64,27 @@ public class Server
         }
       });
 
-      Thread listener = new Thread(new Runnable() 
+      Thread listener = new Thread(new Runnable() // thread to listen for new json from clients
       {
-        String json;
-        @Override
-        public void run()
+        String json; // variable that will contain data written by client
+        @Override // override the run method
+        public void run() 
         {
-          try
+          try // try to read json from the client
           {
             json = in.readLine();
-            while(json != null)
+            while(json != null) // while the client is active write any json they write
             {
               System.out.println(json);
               json = in.readLine();
             }
-            System.out.println("Client disconnected");
+            System.out.println("Client disconnected"); // if the loop breaks then disconnect the client gracefully
+            /* close resources */
             out.close();
             socket.close();
             server_socket.close();
           }
-          catch (IOException e) { e.printStackTrace(); }
+          catch (IOException e) { e.printStackTrace(); } // if any input output errors occour, print them
         }
       });
       sender.start(); // starts the sender
