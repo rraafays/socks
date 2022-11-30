@@ -2,12 +2,15 @@ package socks;
 
 // input output library
 import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.io.IOException;
+import java.io.BufferedWriter;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.IOException;
+
 // network library
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 // utility library
 import java.util.Scanner;
@@ -71,8 +74,30 @@ public class Server
   }
 }
 
-class Handler // TODO: write client handler class
+class Handler implements Runnable // by implementing this class as runnable we can execute it on multiple threads
 {
-  public Socket socket;
-  public Handler(Socket socket) { this.socket = socket; }
+  private Socket socket; // the client socket which needs handling
+  private BufferedReader reader;
+  private BufferedWriter writer;
+  private String identity;
+  public static ArrayList<Handler> handlers = new ArrayList<>(); // static as all handlers must access the same array instead of having their own instances
+
+  public Handler(Socket socket) // constructor which sets the client socket
+  { 
+    try
+    {
+      this.socket = socket; 
+      this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+      this.identity = reader.readLine();
+      handlers.add(this);
+    }
+    catch (IOException e) { e.printStackTrace(); }
+  } 
+
+  @Override
+  public void run() // because our class is runnable we must override the run method
+  {
+
+  }
 }
