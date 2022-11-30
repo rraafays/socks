@@ -36,18 +36,18 @@ public class Server
     // 5 - loop 3
 
     final int PORT = 12345; // constant port number
-    ServerSocket ss; // server socket object
-    Socket s; // socket object
-    BufferedReader i; // buffered reader for socket
-    PrintWriter o; // print writer for writing data into the socket
-    Scanner sc = new Scanner(System.in);
+    ServerSocket server_socket; // server socket object
+    Socket socket; // socket object
+    BufferedReader in; // buffered reader for socket
+    PrintWriter out; // print writer for writing data into the socket
+    Scanner scanner = new Scanner(System.in);
 
     try // try to instantiate our objects
     { 
-      ss = new ServerSocket(PORT); // server socket constructor requires port number
-      s = ss.accept(); // server socket accept method to wait for and accept connections
-      o = new PrintWriter(s.getOutputStream()); // create print writer from client output stream
-      i = new BufferedReader(new InputStreamReader(s.getInputStream())); // create buffered reader from client input stream
+      server_socket = new ServerSocket(PORT); // server socket constructor requires port number
+      socket = server_socket.accept(); // server socket accept method to wait for and accept connections
+      out = new PrintWriter(socket.getOutputStream()); // create print writer from client output stream
+      in = new BufferedReader(new InputStreamReader(socket.getInputStream())); // create buffered reader from client input stream
 
       Thread sender = new Thread(new Runnable() 
       {
@@ -57,9 +57,9 @@ public class Server
         {
           while(true)
           {
-            json = sc.nextLine(); // reads data from client terminal
-            o.println(json); // write data stored in msg
-            o.flush(); // flushes the printwriter
+            json = scanner.nextLine(); // reads data from client terminal
+            out.println(json); // write data stored in msg
+            out.flush(); // flushes the printwriter
           }
         }
       });
@@ -72,16 +72,16 @@ public class Server
         {
           try
           {
-            json = i.readLine();
+            json = in.readLine();
             while(json != null)
             {
               System.out.println(json);
-              json = i.readLine();
+              json = in.readLine();
             }
             System.out.println("Client disconnected");
-            o.close();
-            s.close();
-            ss.close();
+            out.close();
+            socket.close();
+            server_socket.close();
           }
           catch (IOException e) { e.printStackTrace(); }
         }
