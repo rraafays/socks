@@ -80,7 +80,7 @@ class Handler implements Runnable // by implementing this class as runnable we c
   private BufferedReader reader;
   private BufferedWriter writer;
   private String identity;
-  public static ArrayList<Handler> subscribed = new ArrayList<>();
+  public ArrayList<Handler> channels = new ArrayList<>();
   public static ArrayList<Handler> handlers = new ArrayList<>(); // static as all handlers must access the same array instead of having their own instances
 
   public Handler(Socket socket) // constructor which sets the client socket
@@ -113,7 +113,7 @@ class Handler implements Runnable // by implementing this class as runnable we c
   public void Publish(String json)
   {
     // TODO: change the loop to only send to
-    for (Handler handler : subscribed)
+    for (Handler handler : handlers)
     {
       try
       {
@@ -125,6 +125,17 @@ class Handler implements Runnable // by implementing this class as runnable we c
         }
       }
       catch (IOException e) { e.printStackTrace(); /* TODO: method to close everything */ break; } // if any errors occour, print them
+    }
+  }
+
+  public void Subscribe(String json)
+  {
+    for (Handler handler : handlers)
+    {
+      if (handler.identity == json)
+      {
+        channels.add(handler);
+      }
     }
   }
 }
