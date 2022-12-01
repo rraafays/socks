@@ -86,18 +86,26 @@ class Handler implements Runnable // by implementing this class as runnable we c
   { 
     try
     {
-      this.socket = socket; 
-      this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-      this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-      this.identity = reader.readLine();
-      handlers.add(this);
+      this.socket = socket;  // assigns socket to the handler
+      this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // creates buffered reader from the input stream reader
+      this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())); // creates buffered writer from the output stream reader
+      this.identity = reader.readLine(); // gets the client's identity from their input
+      handlers.add(this); // adds the current handler to an array of handlers
+      Open_Request open_request = new Open_Request(); // create open request
+      open_request._class = "OpenRequest"; open_request.identity = identity + " has entered the chat"; // sets the _class and identity
+      // TODO: interpret the request
     }
-    catch (IOException e) { e.printStackTrace(); }
+    catch (IOException e) { e.printStackTrace(); /* TODO: method to close everything */ } // if any errors occour, print them
   } 
 
   @Override
   public void run() // because our class is runnable we must override the run method
   {
-
+    String json;
+    while (socket.isConnected()) // while the client is connected
+    {
+      try { json = reader.readLine(); /* TODO interpret the request */ } // read json written manually by the client
+      catch (IOException e) { e.printStackTrace(); /* TODO: method to close everything */ break; } // if any errors occour, print them
+    }
   }
 }
