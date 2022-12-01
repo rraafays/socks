@@ -82,6 +82,7 @@ class Handler implements Runnable // by implementing this class as runnable we c
   private String identity;
   public ArrayList<Handler> channels = new ArrayList<>();
   public static ArrayList<Handler> handlers = new ArrayList<>(); // static as all handlers must access the same array instead of having their own instances
+  private static ObjectMapper mapper;
 
   public Handler(Socket socket) // constructor which sets the client socket
   { 
@@ -112,30 +113,39 @@ class Handler implements Runnable // by implementing this class as runnable we c
 
   public void Publish(String json)
   {
-    // TODO: change the loop to only send to
-    for (Handler handler : handlers)
+    try
     {
-      try
+      Publish_Request publish_request = mapper.readValue(json, Publish_Request.class);
+      for (Handler handler : channels)
       {
-        if (!handler.identity.equals(identity))
+        try
         {
-          handler.writer.write(json);
-          handler.writer.newLine();
-          handler.writer.flush();
+          if (!handler.identity.equals(identity))
+          {
+            handler.writer.write(publish_request.message.body);
+            handler.writer.newLine();
+            handler.writer.flush();
+          }
         }
+        catch (IOException e) { e.printStackTrace(); /* TODO: method to close everything */ break; } // if any errors occour, print them
       }
-      catch (IOException e) { e.printStackTrace(); /* TODO: method to close everything */ break; } // if any errors occour, print them
     }
+    catch (JsonProcessingException e) { e.printStackTrace(); }
   }
 
   public void Subscribe(String json)
   {
-    for (Handler handler : handlers)
+    try
     {
-      if (handler.identity == json)
+      Subscribe_Request subscribe_request = mapper.readValue(json, Subscribe_Request.class);
+      for (Handler handler : handlers)
       {
-        channels.add(handler);
+        if (handler.identity == subscribe_request.channel)
+        {
+          channels.add(handler);
+        }
       }
     }
+    catch (JsonProcessingException e) { e.printStackTrace(); }
   }
 }
