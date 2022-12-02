@@ -111,41 +111,41 @@ class Handler implements Runnable // by implementing this class as runnable we c
     }
   }
 
-  public void Publish(String json)
+  public void Publish(String publish_request_json) // publish message from a publish request json string
   {
     try
     {
-      Publish_Request publish_request = mapper.readValue(json, Publish_Request.class);
-      for (Handler handler : channels)
+      Publish_Request publish_request = mapper.readValue(publish_request_json, Publish_Request.class); // create publish request object from publish request json string
+      for (Handler handler : channels) // for each handler in channels
       {
         try
         {
-          if (!handler.identity.equals(identity))
+          if (!handler.identity.equals(identity)) // if the identity is not the current client's identity
           {
-            handler.writer.write(publish_request.message.body);
-            handler.writer.newLine();
-            handler.writer.flush();
+            handler.writer.write(publish_request.message.body); // write the body of the message from their publish request
+            handler.writer.newLine(); // write a newline to client
+            handler.writer.flush(); // flush the system
           }
         }
         catch (IOException e) { e.printStackTrace(); /* TODO: method to close everything */ break; } // if any errors occour, print them
       }
     }
-    catch (JsonProcessingException e) { e.printStackTrace(); }
+    catch (JsonProcessingException e) { e.printStackTrace(); } // if there are any errors processing json, print them
   }
 
-  public void Subscribe(String json)
+  public void Subscribe(String subscribe_request_json) // subscribe to a channel from a subscribe request json string
   {
     try
     {
-      Subscribe_Request subscribe_request = mapper.readValue(json, Subscribe_Request.class);
-      for (Handler handler : handlers)
+      Subscribe_Request subscribe_request = mapper.readValue(subscribe_request_json, Subscribe_Request.class); // create subscribe request object from subscribe request json string
+      for (Handler handler : handlers) // for each handler in handlers
       {
-        if (handler.identity == subscribe_request.channel)
+        if (handler.identity == subscribe_request.channel) // if the identity matches that of which, was in the request 
         {
-          channels.add(handler);
+          channels.add(handler); // add them to the client's channels array
         }
       }
     }
-    catch (JsonProcessingException e) { e.printStackTrace(); }
+    catch (JsonProcessingException e) { e.printStackTrace(); } // if there are any errors processing json, print them
   }
 }
