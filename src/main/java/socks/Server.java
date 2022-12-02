@@ -56,6 +56,7 @@ public class Server
         System.out.println("Client connected."); // output that a new client has connected
         Handler handler = new Handler(socket); // create a client handler for this socket
         Thread thread = new Thread(handler);
+        thread.start();
       }
     }
     catch (IOException e) { e.printStackTrace(); } // if any errors occour, print them
@@ -127,7 +128,7 @@ class Handler implements Runnable // by implementing this class as runnable we c
             handler.writer.flush(); // flush the system
           }
         }
-        catch (IOException e) { e.printStackTrace(); /* TODO: method to close everything */ break; } // if any errors occour, print them
+        catch (IOException e) { e.printStackTrace(); break; } // if any errors occour, print them
       }
     }
     catch (JsonProcessingException e) { e.printStackTrace(); } // if there are any errors processing json, print them
@@ -147,5 +148,26 @@ class Handler implements Runnable // by implementing this class as runnable we c
       }
     }
     catch (JsonProcessingException e) { e.printStackTrace(); } // if there are any errors processing json, print them
+  }
+
+  public void Open(String open_request_json)
+  {
+    try 
+    {
+      Open_Request open_request = mapper.readValue(open_request_json, Open_Request.class);
+    }
+    catch (JsonProcessingException e) { e.printStackTrace(); } // if there are any errors processing json, print them
+  }
+
+  public void End()
+  {
+    handlers.remove(this);
+    try
+    {
+      if (reader != null) { reader.close(); }
+      if (writer != null) { writer.close(); }
+      if (socket != null) { socket.close(); }
+    }
+    catch (IOException e) { e.printStackTrace(); } // if any errors occour, print them
   }
 }
