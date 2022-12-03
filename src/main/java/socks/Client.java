@@ -1,21 +1,14 @@
 package socks;
 
 // input output library
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
 
 // network library
 import java.net.Socket;
 
 // utility library
 import java.util.Scanner;
-
-// jackson json library
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 // objects to map json sent by the server into
 class SuccessResponse { public String _class; }
@@ -24,17 +17,17 @@ class MessageListResponse { public String _class; public Message[] messages; }
 
 public class Client
 {
-  static Scanner scanner = new Scanner(System.in);
+  static Scanner scanner = new Scanner(System.in); // scanner object to get input from the user
 
-  final static String ADDR = "localhost";
-  final static int PORT = 12345;
+  final static String ADDR = "localhost"; // constant address string
+  final static int PORT = 12345; // constant port number
 
   public static void main(String[] args) throws IOException
   {
-    System.out.println("Enter identity: ");
-    String identity = scanner.nextLine();
-    String open_request_json = "{\"_class\":\"OpenRequest\", \"identity\":\"" + identity + "\"}";
+    System.out.println("Enter identity: "); // prompt client for an identity
+    String identity = scanner.nextLine(); // read the client's input using scanner
+    String open_request_json = "{\"_class\":\"OpenRequest\", \"identity\":\"" + identity + "\"}"; // write open request string using client's identity
 
-    Socket socket = new Socket(ADDR, PORT);
+    Socket socket = new Socket(ADDR, PORT); // create a new socket and connect to ADDR:PORT (localhost:12345)
   }
 }
