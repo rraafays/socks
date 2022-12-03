@@ -25,20 +25,16 @@ class MessageListResponse { public String _class; public Message[] messages; }
 public class Client
 {
   static Scanner scanner = new Scanner(System.in);
-  static ObjectMapper mapper = new ObjectMapper();
 
-  public static void main(String[] args)
+  final static String ADDR = "localhost";
+  final static int PORT = 12345;
+
+  public static void main(String[] args) throws IOException
   {
     System.out.println("Enter identity: ");
     String identity = scanner.nextLine();
     String open_request_json = "{\"_class\":\"OpenRequest\", \"identity\":\"" + identity + "\"}";
 
-    System.out.println(open_request_json);
-    try 
-    {
-      Open_Request open_request =  mapper.readValue(open_request_json, Open_Request.class);
-      System.out.println(open_request.identity);
-    }
-    catch (JsonProcessingException e) { e.printStackTrace(); }
+    Socket socket = new Socket(ADDR, PORT);
   }
 }

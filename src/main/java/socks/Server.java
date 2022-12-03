@@ -1,23 +1,11 @@
 package socks;
 
 // input output library
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.IOException;
 
 // network library
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-
-// utility library
-import java.util.Scanner;
-
-// jackson json library
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 // objects to map json sent by the client into
 class Message { public String _class; public String from; public int when; public String body; }
@@ -34,8 +22,13 @@ class Get_Request { public String _class; public String identity; public int aft
 
 public class Server
 {
+  final static int PORT = 12345;
+
   public static void main(String[] args) throws IOException
   {
-    System.out.println("i will be the server for a client server socket chat app which uses json");
+    System.out.println("waiting for clients..");
+    ServerSocket server_socket = new ServerSocket(PORT);
+    Socket socket = server_socket.accept();
+    System.out.println("connection established.");
   }
 }
