@@ -2,6 +2,8 @@ package socks;
 
 // input output library
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 // network library
 import java.net.ServerSocket;
@@ -22,13 +24,17 @@ class Get_Request { public String _class; public String identity; public int aft
 
 public class Server
 {
-  final static int PORT = 12345;
+  final static int PORT = 12345; // constant port number
 
   public static void main(String[] args) throws IOException
   {
-    System.out.println("waiting for clients..");
-    ServerSocket server_socket = new ServerSocket(PORT);
-    Socket socket = server_socket.accept();
-    System.out.println("connection established.");
+    System.out.println("waiting for clients.."); // write message expecting clients
+    ServerSocket server_socket = new ServerSocket(PORT); // create server socket at our PORT (12345)
+    Socket socket = server_socket.accept(); // accept a single socket into our server socket
+    System.out.println("connection established."); // write that a connection has been established
+
+    BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // create buffered reader from the socket's input stream
+    String open_request = reader.readLine(); // use the reader to receive an openrequest
+    System.out.println(open_request); // spit out the request
   }
 }
