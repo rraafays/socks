@@ -36,5 +36,6 @@ public class Server
     BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // create buffered reader from the socket's input stream
     String open_request = reader.readLine(); // use the reader to receive an openrequest
     System.out.println(open_request); // spit out the request
+    server_socket.close();
   }
 }
