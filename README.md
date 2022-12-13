@@ -19,12 +19,12 @@ First build socks:
 make
 ```
 
-Then run server:
+Then run server using python wrapper:
 ```sh
-./server
+python3 server.py
 ```
 
 Finally, run as many clients as you'd like.
 ```sh
-./client
+python3 client.py
 ```
