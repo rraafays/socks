@@ -31,6 +31,10 @@ public class Client
     String identity = reader.readLine(); // read the client's input
     String open_request_json = "{\"_class\":\"OpenRequest\", \"identity\":\"" + identity + "\"}"; // write open request string using client's identity
     writer.println(open_request_json); // write the open request back to the server for it to interpret
-    socket.close();
+    while (true)
+    {
+      writer.println(reader.readLine());
+    }
+    // socket.close();
   }
 }
