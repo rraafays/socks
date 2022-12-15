@@ -33,7 +33,14 @@ public class Client
     writer.println(open_request_json); // write the open request back to the server for it to interpret
     while (true)
     {
-      writer.println(reader.readLine());
+      System.out.println("[1] Publish");
+      System.out.println("[2] Subscribe");
+      System.out.println("[3] Get Messages");
+      
+      String option = reader.readLine();
+      if (option.equals("1")) { writer.println("1"); }
+      if (option.equals("2")) { writer.println("2"); }
+      if (option.equals("3")) { writer.println("3"); }
     }
     // socket.close();
   }
