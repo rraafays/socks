@@ -21,10 +21,10 @@ make
 
 Then run server using python wrapper:
 ```sh
-python3 server.py
+./server
 ```
 
 Finally, run as many clients as you'd like.
 ```sh
-python3 client.py
+./client
 ```
