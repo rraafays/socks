@@ -9,7 +9,13 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+// jackson library
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 // objects to map json sent by the client into
+@JsonIgnoreProperties(ignoreUnknown = true)
+class Mask { public String _class; }
 class Message { public String _class; public String from; public int when; public String body; }
 class Open_Request { public String _class; public String identity; }
 class Publish_Request { public String _class; public String identity; public Message message; }
@@ -24,6 +30,7 @@ class Get_Request { public String _class; public String identity; public int aft
 
 public class Server
 {
+  static ObjectMapper mapper = new ObjectMapper(); // json object mapper
   final static int PORT = 12345; // constant port number
 
   public static void main(String[] args) throws IOException
@@ -34,11 +41,10 @@ public class Server
     System.out.println("connection established."); // write that a connection has been established
 
     BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // create buffered reader from the socket's input stream
-    String open_request = reader.readLine(); // use the reader to receive an openrequest
-    System.out.println(open_request); // spit out the request
     while (true)
     {
-      System.out.println(reader.readLine());
+      Mask mask = mapper.readValue(reader.readLine(), Mask.class);
+      if (mask._class.equals("OpenRequest")) { System.out.println("test succeeded"); }
     }
     // server_socket.close();
   }
