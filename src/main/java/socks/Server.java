@@ -63,8 +63,8 @@ public class Server
     { 
       Open_Request open_request = mapper.readValue(open_request_json, Open_Request.class); // map the open request json string to an open request object
       channels.add(open_request.identity); // add the specified identity to the channels list from the open request
-      client_handler.identity = open_request.identity;
-      System.out.println(client_handler.identity + " has joined the chat");
+      client_handler.identity = open_request.identity; // set the identity of the client handler using the open request
+      System.out.println(client_handler.identity + " has joined the chat"); // display that the client has connected referencing their name
     }
     catch (JsonProcessingException e) { e.printStackTrace(); } // if any errors occur, print them
   }
