@@ -70,4 +70,4 @@ public class Server
   }
 }
 
-class Client_Handler { public String identity; public Socket socket; public BufferedReader reader; } // client handler class to set attributes for each client
+class Client_Handler { public String identity; public Socket socket; public BufferedReader reader; public PrintWriter writer; } // client handler class to set attributes for each client
