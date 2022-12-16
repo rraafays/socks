@@ -41,27 +41,33 @@ public class Server
   public static void main(String[] args) throws IOException
   {
     System.out.println("waiting for clients.."); // write message expecting clients
-    ServerSocket server_socket = new ServerSocket(PORT); // create server socket at our PORT (12345)
-    Socket socket = server_socket.accept(); // accept a single socket into our server socket
-    System.out.println("connection established."); // write that a connection has been established
+    ServerSocket server_socket = new ServerSocket(PORT); // create server socket at our port (12345)
 
-    BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // create buffered reader from the socket's input stream
+    Client_Handler client_handler = new Client_Handler(); // create client handler
+    client_handler.socket = server_socket.accept(); // accept the client handlers socket into the server socket
+    System.out.println("connection established."); // write that a connection has been established
+    client_handler.reader = new BufferedReader(new InputStreamReader(client_handler.socket.getInputStream())); // create buffered reader from the socket's input  
+
     while (true) // infinite while loop
     {
-      String json = reader.readLine();
-      Mask mask = mapper.readValue(json, Mask.class); // create mask from json received from client
-      if (mask._class.equals("OpenRequest")) { Add_Channel(json); } 
+      String request_json = client_handler.reader.readLine(); // recieve requests in the form of json strings from the client
+      Mask mask = mapper.readValue(request_json, Mask.class); // mask the request sent by the client to determine it's _class attribute
+
+      if (mask._class.equals("OpenRequest")) { Add_Channel(request_json, client_handler); } // if an open request is recieved then add the channel to the channels list
     }
   }
 
-  static void Add_Channel(String open_request_json) // add channel to the channels list from an open request
+  static void Add_Channel(String open_request_json, Client_Handler client_handler) // add channel to the channels list from an open request
   {
     try 
     { 
       Open_Request open_request = mapper.readValue(open_request_json, Open_Request.class); // map the open request json string to an open request object
       channels.add(open_request.identity); // add the specified identity to the channels list from the open request
-      System.out.println("SUCCESS");
+      client_handler.identity = open_request.identity;
+      System.out.println(client_handler.identity + " has joined the chat");
     }
     catch (JsonProcessingException e) { e.printStackTrace(); } // if any errors occur, print them
   }
 }
+
+class Client_Handler { public String identity; public Socket socket; public BufferedReader reader; } // client handler class to set attributes for each client
