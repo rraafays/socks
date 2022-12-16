@@ -4,14 +4,16 @@ package socks;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-
+import java.io.PrintWriter;
 // network library
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 // jackson library
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 // dummy class which only contains _class used to mask json strings
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -24,7 +26,7 @@ class Publish_Request { public String _class; public String identity; public Mes
 class Subscribe_Request { public String _class; public String identity; public String channel; }
 class Get_Request { public String _class; public String identity; public int after; }
 
-// 1 - client sends openrequest identifying the channel to publish on
+// 1 - client sends open request identifying the channel to publish on
 // 2 - server responds with success if it succeedes
 // 3 - client sends either publish, subscribe, unsubscribe or get requests
 // 4 - in case of get, server responds with messagelist otherwise server responds with success or error
@@ -32,8 +34,9 @@ class Get_Request { public String _class; public String identity; public int aft
 
 public class Server
 {
-  static ObjectMapper mapper = new ObjectMapper(); // json object mapper
   final static int PORT = 12345; // constant port number
+  static ObjectMapper mapper = new ObjectMapper(); // json object mapper
+  static ArrayList<String> channels = new ArrayList<String>();
 
   public static void main(String[] args) throws IOException
   {
@@ -45,8 +48,20 @@ public class Server
     BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // create buffered reader from the socket's input stream
     while (true) // infinite while loop
     {
-      Mask mask = mapper.readValue(reader.readLine(), Mask.class); // create mask from json received from client
-      if (mask._class.equals("OpenRequest")) { System.out.println("test succeeded"); } // TODO: handle open request
+      String json = reader.readLine();
+      Mask mask = mapper.readValue(json, Mask.class); // create mask from json received from client
+      if (mask._class.equals("OpenRequest")) { Add_Channel(json); } 
     }
+  }
+
+  static void Add_Channel(String open_request_json) // add channel to the channels list from an open request
+  {
+    try 
+    { 
+      Open_Request open_request = mapper.readValue(open_request_json, Open_Request.class); // map the open request json string to an open request object
+      channels.add(open_request.identity); // add the specified identity to the channels list from the open request
+      System.out.println("SUCCESS");
+    }
+    catch (JsonProcessingException e) { e.printStackTrace(); } // if any errors occur, print them
   }
 }
