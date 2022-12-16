@@ -33,39 +33,39 @@ public class Client
     System.out.println("Enter identity: "); // prompt client for an identity
     String identity = client.readLine(); // read the client's input
 
-    Open_Request open_request = new Open_Request(); // create a new open request
+    Open_Request open_request = new Open_Request(); // create new open request
     open_request._class = "OpenRequest"; open_request.identity = identity; // initialise using client identity
-    
     server.println(mapper.writeValueAsString(open_request)); // write the open request back to the server for it to interpret
-    while (true)
+
+    while (true) // infinite while loop
     {
       ShowMenu(); // main menu: 1 for publish, 2 for subscribe, 3 for getting messages
       
       String option = client.readLine(); // grab an argument number from the client's input
-      if (option.equals("1")) { server.println(Publish()); }
-      if (option.equals("2")) { server.println(Subscribe()); }
-      if (option.equals("3")) { server.println(Get()); }
+      if (option.equals("1")) { server.println(Publish()); } // if option is 1 then publish
+      if (option.equals("2")) { server.println(Subscribe()); } // if option is 2 then subscribe
+      if (option.equals("3")) { server.println(Get()); } // if option is 3 then get messages
     }
   }
 
-  static void ShowMenu()
+  static void ShowMenu() // print options menu
   {
     System.out.println("[1] Publish");
     System.out.println("[2] Subscribe");
     System.out.println("[3] Get Messages");
   }
 
-  static String Publish()
+  static String Publish() // build publish request
   {
     return("1 is not implemented!");
   }
 
-  static String Subscribe()
+  static String Subscribe() // build subscribe request
   {
     return("2 is not implemented!");
   }
 
-  static String Get()
+  static String Get() // build get request
   {
     return("3 is not implemented!");
   }

@@ -13,9 +13,11 @@ import java.net.Socket;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-// objects to map json sent by the client into
+// dummy class which only contains _class used to mask json strings
 @JsonIgnoreProperties(ignoreUnknown = true)
 class Mask { public String _class; }
+
+// objects to map json sent by the client into
 class Message { public String _class; public String from; public int when; public String body; }
 class Open_Request { public String _class; public String identity; }
 class Publish_Request { public String _class; public String identity; public Message message; }
@@ -41,11 +43,10 @@ public class Server
     System.out.println("connection established."); // write that a connection has been established
 
     BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // create buffered reader from the socket's input stream
-    while (true)
+    while (true) // infinite while loop
     {
-      Mask mask = mapper.readValue(reader.readLine(), Mask.class);
-      if (mask._class.equals("OpenRequest")) { System.out.println("test succeeded"); }
+      Mask mask = mapper.readValue(reader.readLine(), Mask.class); // create mask from json received from client
+      if (mask._class.equals("OpenRequest")) { System.out.println("test succeeded"); } // TODO: handle open request
     }
-    // server_socket.close();
   }
 }
