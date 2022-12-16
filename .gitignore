@@ -1,5 +1,8 @@
 # gradle cache and build output
 .gradle/
 build/
+# c binaries for wrapper program
+server
+client
 # mac database file
 .DS_Store
