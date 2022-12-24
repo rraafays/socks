@@ -3,7 +3,7 @@ Multithreaded client server socket chat app written in Java which uses json prot
 
 ### Goals
 - quality: maintain high quality java code
-- versatile: able to send more than just text
+- versatile: able to send files aswell as text
 - hackable: comment unobvious code and use few lines with good explanation
 
 ### Order of Operation
