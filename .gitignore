@@ -1,5 +1,6 @@
 # gradle cache and build output
 .gradle/
+.settings/
 build/
 # c binaries for wrapper program
 server
