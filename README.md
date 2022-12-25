@@ -19,7 +19,7 @@ First build socks:
 make
 ```
 
-Then run server using python wrapper:
+Then run server using wrapper:
 ```sh
 ./server
 ```
