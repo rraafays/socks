@@ -4,7 +4,7 @@ package socks;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+
 // network library
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -15,10 +15,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-// dummy class which only contains _class used to mask json strings
+// object used to mask json strings to determine their _class attribute
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Mask { public String _class; }
-
+class Mask { public String _class; } // E.G: if (mask._class.equals("OpenRequest")) { Add_Channel(request_json, client_handler); }
 // objects to map json sent by the client into
 class Message { public String _class; public String from; public int when; public String body; }
 class Open_Request { public String _class; public String identity; }
@@ -34,27 +33,33 @@ class Get_Request { public String _class; public String identity; public int aft
 
 public class Server
 {
-  final static int PORT = 12345; // constant port number
-  static ObjectMapper mapper = new ObjectMapper(); // json object mapper
-  static ArrayList<String> channels = new ArrayList<String>();
+  private final static int PORT = 12345; // constant port number
+  private ServerSocket server_socket;
+  private static ObjectMapper mapper = new ObjectMapper(); // json object mapper
+  private static ArrayList<String> channels = new ArrayList<String>();
 
   public static void main(String[] args) throws IOException
   {
-    System.out.println("waiting for clients.."); // write message expecting clients
-    ServerSocket server_socket = new ServerSocket(PORT); // create server socket at our port (12345)
 
-    Client_Handler client_handler = new Client_Handler(); // create client handler
-    client_handler.socket = server_socket.accept(); // accept the client handlers socket into the server socket
-    System.out.println("connection established."); // write that a connection has been established
-    client_handler.reader = new BufferedReader(new InputStreamReader(client_handler.socket.getInputStream())); // create buffered reader from the socket's input  
+  }
 
-    while (true) // infinite while loop
+  public void Start() // start the server by initialising it and connecting new clients
+  {
+    try
     {
-      String request_json = client_handler.reader.readLine(); // recieve requests in the form of json strings from the client
-      Mask mask = mapper.readValue(request_json, Mask.class); // mask the request sent by the client to determine it's _class attribute
+      while (!server_socket.isClosed()) // while the server socket is open
+      {
+        Socket socket = server_socket.accept(); // wait for and accept incoming sockets
+        System.out.println("new socket has connected!"); // output that a new socket has connected
+        System.out.println("waiting for open request.."); // output that the server is waiting for an open request
+        /* TODO: handle open request and create channel */
 
-      if (mask._class.equals("OpenRequest")) { Add_Channel(request_json, client_handler); } // if an open request is recieved then add the channel to the channels list
+        Client_Handler client_handler = new Client_Handler();
+        Thread thread = new Thread(client_handler);
+        thread.start();
+      }
     }
+    catch (IOException e) { /* TODO: gracefully stop server */ }
   }
 
   static void Add_Channel(String open_request_json, Client_Handler client_handler) // add channel to the channels list from an open request
@@ -69,5 +74,3 @@ public class Server
     catch (JsonProcessingException e) { e.printStackTrace(); } // if any errors occur, print them
   }
 }
-
-class Client_Handler { public String identity; public Socket socket; public BufferedReader reader; public PrintWriter writer; } // client handler class to set attributes for each client
