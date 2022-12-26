@@ -34,13 +34,17 @@ class Get_Request { public String _class; public String identity; public int aft
 public class Server
 {
   private final static int PORT = 12345; // constant port number
-  private ServerSocket server_socket;
   private static ObjectMapper mapper = new ObjectMapper(); // json object mapper
   private static ArrayList<String> channels = new ArrayList<String>();
+  private ServerSocket server_socket;
+
+  public Server(ServerSocket server_socket) { this.server_socket = server_socket; } // constructor which sets server socket
 
   public static void main(String[] args) throws IOException
   {
-
+    ServerSocket server_socket = new ServerSocket(PORT); // create server socket at our port number
+    Server server = new Server(server_socket); // pass that server socket to our constructor
+    server.Start(); // start server
   }
 
   public void Start() // start the server by initialising it and connecting new clients
@@ -59,7 +63,19 @@ public class Server
         thread.start();
       }
     }
-    catch (IOException e) { /* TODO: gracefully stop server */ }
+    catch (IOException error) { Stop(); }
+  }
+
+  public void Stop() // stop the server gracefully to avoid errors
+  {
+    try
+    {
+      if (server_socket != null) // avoid null pointer exceptions
+      {
+        server_socket.close(); // close the socket
+      }
+    }
+    catch (IOException error) { error.printStackTrace(); }
   }
 
   static void Add_Channel(String open_request_json, Client_Handler client_handler) // add channel to the channels list from an open request
