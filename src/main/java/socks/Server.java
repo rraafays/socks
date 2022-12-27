@@ -109,20 +109,19 @@ class Client_Handler implements Runnable
     catch (IOException error) { /* TODO: method to stop client handler */ } // if any errors occour, gracefully close
   }
 
-  @Override
+  @Override // override run method of client handler class since it is runnable
   public void run()
   {
-    String json;
-
-    while (socket.isConnected())
+    String json; // empty string to store json received from the client
+    while (socket.isConnected()) // while the socket is connected
     {
       try
       {
-        json = reader.readLine();
-        System.out.println(json);
-        BufferedWriter log = new BufferedWriter(new FileWriter(PATH, true));
-        log.append(json + "\n");
-        log.close();
+        json = reader.readLine(); // json is read from the client
+        System.out.println(json); // FIXME: print the json to display it to the terminal
+        BufferedWriter log = new BufferedWriter(new FileWriter(PATH, true)); // open filewriter for a file specified by path and set it to autoflush
+        log.append(json + "\n"); // append the json and a line break to the json
+        log.close(); // close the file
       }
       catch (IOException error) { /* TODO: method to stop client handler */ break; }
     }
