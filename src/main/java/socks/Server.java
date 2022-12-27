@@ -100,15 +100,6 @@ class Client_Handler implements Runnable
       this.socket = socket; // set the given socket to socket
       this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // get the socket's input stream, create an input reader out of that stream, then create a buffered reader out of that reader 
       this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())); // get the socket's output stream, create an output writer out of that stream, then create a buffered writer out of that writer
-
-      String json = reader.readLine(); // read json string from the client
-      if (mapper.readValue(json, Mask.class)._class.equals("OpenRequest")) // if the json string's class is open request
-      { 
-        this.identity = mapper.readValue(json, Open_Request.class).identity; // set the identity of the client handler to specified identity
-        subscribed_channels.add(identity); // subscribe to itself
-        client_handlers.add(this); // track this client handler
-      }       
-      /* TODO: method to send success response */
     }
     catch (IOException error) { /* TODO: method to stop client handler */ } // if any errors occour, gracefully close
   }
@@ -126,10 +117,22 @@ class Client_Handler implements Runnable
         log.append(json + "\n"); // append the json and a line break to the json
         log.close(); // close the file
         
-        if (mapper.readValue(json, Mask.class)._class.equals("SubscribeRequest")) { Subscribe(json); }
+        if (mapper.readValue(json, Mask.class)._class.equals("OpenRequest")) { Open(json); } // if _class is open request, open the channel
+        if (mapper.readValue(json, Mask.class)._class.equals("SubscribeRequest")) { Subscribe(json); } // if _class is subscribe request then subscribe
       }
       catch (IOException error) { /* TODO: method to stop client handler */ break; }
     }
+  }
+
+  void Open(String json)
+  {
+    try
+    {
+      this.identity = mapper.readValue(json, Open_Request.class).identity; // set the identity of the client handler to specified identity
+      subscribed_channels.add(identity); // subscribe to itself
+      client_handlers.add(this); // track this client handler
+    }
+    catch (JsonProcessingException error) {  }
   }
 
   void Subscribe(String json) // subscribe to channel
@@ -150,7 +153,7 @@ class Client_Handler implements Runnable
       if (!found) // if the channel has not been found
       {
         Error_Response  error_response = new Error_Response(); // create new error response
-        error_response._class = "ErrorResponse"; // set class to error response
+        error_response._class = "ErrorResponse"; // set _class to error response
         error_response.error = "NO SUCH CHANNEL:" + ' ' + channel; // report that there's no such channel
         System.out.println(mapper.writeValueAsString(error_response)); // FIXME: write the response as opposed to send it
       }
