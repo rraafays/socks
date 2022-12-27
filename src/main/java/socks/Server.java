@@ -3,8 +3,9 @@ package socks;
 // input output library
 import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.InputStreamReader;
-
+import java.io.OutputStreamWriter;
 // network library
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -54,11 +55,9 @@ public class Server
       while (!server_socket.isClosed()) // while the server socket is open
       {
         Socket socket = server_socket.accept(); // wait for and accept incoming sockets
-        System.out.println("new socket has connected!"); // output that a new socket has connected
-        System.out.println("waiting for open request.."); // output that the server is waiting for an open request
-        /* TODO: handle open request and create channel */
 
-        Client_Handler client_handler = new Client_Handler();
+        Client_Handler client_handler = new Client_Handler(socket);
+        /* TODO: handle open request and create channel */
         Thread thread = new Thread(client_handler);
         thread.start();
       }
@@ -78,15 +77,35 @@ public class Server
     catch (IOException error) { error.printStackTrace(); }
   }
 
-  static void Add_Channel(String open_request_json, Client_Handler client_handler) // add channel to the channels list from an open request
+  static void Add_Channel()
   {
-    try 
-    { 
-      Open_Request open_request = mapper.readValue(open_request_json, Open_Request.class); // map the open request json string to an open request object
-      channels.add(open_request.identity); // add the specified identity to the channels list from the open request
-      client_handler.identity = open_request.identity; // set the identity of the client handler using the open request
-      System.out.println(client_handler.identity + " has joined the chat"); // display that the client has connected referencing their name
+  }
+}
+
+class Client_Handler implements Runnable
+{
+  public static ArrayList<Client_Handler> channels = new ArrayList<Client_Handler>(); // static array of client handlers to keep track of all open channels
+  private Socket socket; // private socket
+  private BufferedReader reader; // private reader to read from socket
+  private BufferedWriter writer; // private writer to write to socket
+  public String identity; // public identity for the client
+
+  public Client_Handler(Socket socket)
+  {
+    try
+    {
+      this.socket = socket; // set the given socket to socket
+      this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // get the socket's input stream, create an input reader out of that stream, then create a buffered reader out of that reader 
+      this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())); // get the socket's output stream, create an output writer out of that stream, then create a buffered writer out of that writer
+      this.identity = reader.readLine();
+      System.out.println(identity);
     }
-    catch (JsonProcessingException e) { e.printStackTrace(); } // if any errors occur, print them
+    catch (IOException error) { error.printStackTrace(); }
+  }
+
+  @Override
+  public void run()
+  {
+
   }
 }
