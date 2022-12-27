@@ -7,3 +7,5 @@ server
 client
 # mac database file
 .DS_Store
+# program files
+log

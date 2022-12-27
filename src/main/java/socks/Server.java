@@ -85,7 +85,7 @@ class Client_Handler implements Runnable
 {
   private final static String PATH = "log"; // constant log path string
   private static ObjectMapper mapper = new ObjectMapper(); // static object mapper used to map json strings to objects
-  public static ArrayList<Client_Handler> open_channels = new ArrayList<Client_Handler>(); // static array of client handlers to keep track of all open channels
+  public static ArrayList<Client_Handler> client_handlers = new ArrayList<Client_Handler>(); // static array of client handlers to keep track of all open channels
 
   private Socket socket; // private socket
   private BufferedReader reader; // private reader to read from socket
@@ -103,7 +103,7 @@ class Client_Handler implements Runnable
 
       String json = reader.readLine(); // read json string from the client
       if (mapper.readValue(json, Mask.class)._class.equals("OpenRequest")) { this.identity = mapper.readValue(json, Open_Request.class).identity; } // mask json to determine if it's an open request, if it is, set the identity to the identity stored in the open request
-      open_channels.add(this);
+      client_handlers.add(this);
       /* TODO: method to send success response */
     }
     catch (IOException error) { /* TODO: method to stop client handler */ } // if any errors occour, gracefully close
@@ -123,7 +123,6 @@ class Client_Handler implements Runnable
         BufferedWriter log = new BufferedWriter(new FileWriter(PATH, true));
         log.append(json + "\n");
         log.close();
-        /* TODO: save the message to chat log and use method to send success response */
       }
       catch (IOException error) { /* TODO: method to stop client handler */ break; }
     }
