@@ -36,7 +36,6 @@ public class Server
 {
   private final static int PORT = 12345; // constant port number
   private static ObjectMapper mapper = new ObjectMapper(); // json object mapper
-  private static ArrayList<String> channels = new ArrayList<String>();
   private ServerSocket server_socket;
 
   public Server(ServerSocket server_socket) { this.server_socket = server_socket; } // constructor which sets server socket
@@ -84,6 +83,7 @@ public class Server
 
 class Client_Handler implements Runnable
 {
+  private static ObjectMapper mapper = new ObjectMapper(); // json object mapper
   public static ArrayList<Client_Handler> channels = new ArrayList<Client_Handler>(); // static array of client handlers to keep track of all open channels
   private Socket socket; // private socket
   private BufferedReader reader; // private reader to read from socket
@@ -97,10 +97,11 @@ class Client_Handler implements Runnable
       this.socket = socket; // set the given socket to socket
       this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // get the socket's input stream, create an input reader out of that stream, then create a buffered reader out of that reader 
       this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())); // get the socket's output stream, create an output writer out of that stream, then create a buffered writer out of that writer
-      this.identity = reader.readLine();
-      System.out.println(identity);
+
+      String json = reader.readLine(); // read json string from the client
+      if (mapper.readValue(json, Mask.class)._class.equals("OpenRequest")) { this.identity = mapper.readValue(json, Open_Request.class).identity; } // mask json to determine if it's an open request, if it is, set the identity to the identity stored in the open request
     }
-    catch (IOException error) { error.printStackTrace(); }
+    catch (IOException error) { error.printStackTrace(); } // if any errors occour, print them
   }
 
   @Override
