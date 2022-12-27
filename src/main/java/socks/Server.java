@@ -114,7 +114,7 @@ class Client_Handler implements Runnable
       {
         json = reader.readLine(); // json is read from the client
         BufferedWriter log = new BufferedWriter(new FileWriter(PATH, true)); // open filewriter for a file specified by path and set it to autoflush
-        log.append(json + "\n"); // append the json and a line break to the json
+        log.append(json + "\n"); // append the json and add a line break to the json
         log.close(); // close the file
         
         if (mapper.readValue(json, Mask.class)._class.equals("OpenRequest")) { Open(json); } // if _class is open request, open the channel
