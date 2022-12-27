@@ -4,6 +4,7 @@ package socks;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 // network library
@@ -82,6 +83,7 @@ public class Server
 
 class Client_Handler implements Runnable
 {
+  private final static String PATH = "log"; // constant log path string
   private static ObjectMapper mapper = new ObjectMapper(); // static object mapper used to map json strings to objects
   public static ArrayList<Client_Handler> open_channels = new ArrayList<Client_Handler>(); // static array of client handlers to keep track of all open channels
 
@@ -118,8 +120,12 @@ class Client_Handler implements Runnable
       {
         json = reader.readLine();
         System.out.println(json);
+        BufferedWriter log = new BufferedWriter(new FileWriter(PATH, true));
+        log.append(json + "\n");
+        log.close();
+        /* TODO: save the message to chat log and use method to send success response */
       }
-      catch (IOException error) { error.printStackTrace(); }
+      catch (IOException error) { /* TODO: method to stop client handler */ break; }
     }
   }
 }
