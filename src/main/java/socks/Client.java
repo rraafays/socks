@@ -14,9 +14,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 // objects to map json sent by the server into
-class SuccessResponse { public String _class; }
-class ErrorResponse { public String _class; public String error; }
-class MessageListResponse { public String _class; public Message[] messages; }
+class Success_Response { public String _class; }
+class Error_Response { public String _class; public String error; }
+class Message_List_Response { public String _class; public Message[] messages; }
 
 public class Client
 {
