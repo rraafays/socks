@@ -62,7 +62,7 @@ public class Client
 
   static String Subscribe() // build subscribe request
   {
-    return("2 is not implemented!");
+    return("{\"_class\":\"SubscribeRequest\", \"identity\":\"Alice\", \"channel\":\"Bob\"}");
   }
 
   static String Get() // build get request

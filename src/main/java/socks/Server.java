@@ -118,10 +118,18 @@ class Client_Handler implements Runnable
       try
       {
         json = reader.readLine(); // json is read from the client
-        System.out.println(json); // FIXME: print the json to display it to the terminal
         BufferedWriter log = new BufferedWriter(new FileWriter(PATH, true)); // open filewriter for a file specified by path and set it to autoflush
         log.append(json + "\n"); // append the json and a line break to the json
         log.close(); // close the file
+
+        try
+        {
+          if (mapper.readValue(json, Mask.class)._class.equals("SubscribeRequest"))
+          {
+            /* TODO: subscribe to channel specified by subscribe request */
+          }
+        }
+        catch (JsonProcessingException error) { /* TODO: send success response to client */ }
       }
       catch (IOException error) { /* TODO: method to stop client handler */ break; }
     }
