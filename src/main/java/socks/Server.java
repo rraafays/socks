@@ -91,7 +91,7 @@ class Client_Handler implements Runnable
   private BufferedReader reader; // private reader to read from socket
   private BufferedWriter writer; // private writer to write to socket
   public String identity; // public identity for the client
-  public ArrayList<Client_Handler> subscribed_channels = new ArrayList<Client_Handler>(); // array of client handlers which the user has subscribed to
+  public ArrayList<String> subscribed_channels = new ArrayList<String>(); // array to keep track of channels the client has subscribed to
 
   public Client_Handler(Socket socket)
   {
@@ -102,8 +102,12 @@ class Client_Handler implements Runnable
       this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())); // get the socket's output stream, create an output writer out of that stream, then create a buffered writer out of that writer
 
       String json = reader.readLine(); // read json string from the client
-      if (mapper.readValue(json, Mask.class)._class.equals("OpenRequest")) { this.identity = mapper.readValue(json, Open_Request.class).identity; } // mask json to determine if it's an open request, if it is, set the identity to the identity stored in the open request
-      client_handlers.add(this);
+      if (mapper.readValue(json, Mask.class)._class.equals("OpenRequest")) // if the json string's class is open request
+      { 
+        this.identity = mapper.readValue(json, Open_Request.class).identity; // set the identity of the client handler to specified identity
+        subscribed_channels.add(identity); // subscribe to itself
+        client_handlers.add(this); // track this client handler
+      }       
       /* TODO: method to send success response */
     }
     catch (IOException error) { /* TODO: method to stop client handler */ } // if any errors occour, gracefully close
@@ -121,17 +125,36 @@ class Client_Handler implements Runnable
         BufferedWriter log = new BufferedWriter(new FileWriter(PATH, true)); // open filewriter for a file specified by path and set it to autoflush
         log.append(json + "\n"); // append the json and a line break to the json
         log.close(); // close the file
-
-        try
-        {
-          if (mapper.readValue(json, Mask.class)._class.equals("SubscribeRequest"))
-          {
-            /* TODO: subscribe to channel specified by subscribe request */
-          }
-        }
-        catch (JsonProcessingException error) { /* TODO: send success response to client */ }
+        
+        if (mapper.readValue(json, Mask.class)._class.equals("SubscribeRequest")) { Subscribe(json); }
       }
       catch (IOException error) { /* TODO: method to stop client handler */ break; }
     }
+  }
+
+  void Subscribe(String json) // subscribe to channel
+  {
+    try
+    {
+      String channel = mapper.readValue(json, Subscribe_Request.class).channel; // make string called channel which stores the channel provided by the json string
+
+      boolean found = false; // boolean which is set to true once the specified channel has been found
+      for (Client_Handler client_handler : client_handlers) // for each client handler in client handlers
+      {
+        if (client_handler.identity.equals(channel)) // if the client handler's identity matches the specified channel
+        { 
+          subscribed_channels.add(client_handler.identity); // subscribe to it by adding it to subscribed channels
+          found = true; // set found to true
+        }
+      }
+      if (!found) // if the channel has not been found
+      {
+        Error_Response  error_response = new Error_Response(); // create new error response
+        error_response._class = "ErrorResponse"; // set class to error response
+        error_response.error = "NO SUCH CHANNEL:" + ' ' + channel; // report that there's no such channel
+        System.out.println(mapper.writeValueAsString(error_response)); // FIXME: write the response as opposed to send it
+      }
+    }
+    catch (JsonProcessingException error) { /* TODO: send success response to client */ }
   }
 }
