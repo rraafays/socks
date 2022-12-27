@@ -56,7 +56,6 @@ public class Server
         Socket socket = server_socket.accept(); // wait for and accept incoming sockets
 
         Client_Handler client_handler = new Client_Handler(socket);
-        /* TODO: handle open request and create channel */
         Thread thread = new Thread(client_handler);
         thread.start();
       }
@@ -83,12 +82,14 @@ public class Server
 
 class Client_Handler implements Runnable
 {
-  private static ObjectMapper mapper = new ObjectMapper(); // json object mapper
-  public static ArrayList<Client_Handler> channels = new ArrayList<Client_Handler>(); // static array of client handlers to keep track of all open channels
+  private static ObjectMapper mapper = new ObjectMapper(); // static object mapper used to map json strings to objects
+  public static ArrayList<Client_Handler> open_channels = new ArrayList<Client_Handler>(); // static array of client handlers to keep track of all open channels
+
   private Socket socket; // private socket
   private BufferedReader reader; // private reader to read from socket
   private BufferedWriter writer; // private writer to write to socket
   public String identity; // public identity for the client
+  public ArrayList<Client_Handler> subscribed_channels = new ArrayList<Client_Handler>(); // array of client handlers which the user has subscribed to
 
   public Client_Handler(Socket socket)
   {
@@ -100,13 +101,25 @@ class Client_Handler implements Runnable
 
       String json = reader.readLine(); // read json string from the client
       if (mapper.readValue(json, Mask.class)._class.equals("OpenRequest")) { this.identity = mapper.readValue(json, Open_Request.class).identity; } // mask json to determine if it's an open request, if it is, set the identity to the identity stored in the open request
+      open_channels.add(this);
+      /* TODO: method to send success response */
     }
-    catch (IOException error) { error.printStackTrace(); } // if any errors occour, print them
+    catch (IOException error) { /* TODO: method to stop client handler */ } // if any errors occour, gracefully close
   }
 
   @Override
   public void run()
   {
+    String json;
 
+    while (socket.isConnected())
+    {
+      try
+      {
+        json = reader.readLine();
+        System.out.println(json);
+      }
+      catch (IOException error) { error.printStackTrace(); }
+    }
   }
 }
