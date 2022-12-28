@@ -4,9 +4,11 @@ package socks;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+
 // network library
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -27,17 +29,10 @@ class Publish_Request { public String _class; public String identity; public Mes
 class Subscribe_Request { public String _class; public String identity; public String channel; }
 class Get_Request { public String _class; public String identity; public int after; }
 
-// 1 - client sends open request identifying the channel to publish on
-// 2 - server responds with success if it succeedes
-// 3 - client sends either publish, subscribe, unsubscribe or get requests
-// 4 - in case of get, server responds with messagelist otherwise server responds with success or error
-// 5 - loop 3
-
 public class Server
 {
   private final static int PORT = 12345; // constant port number
-  private static ObjectMapper mapper = new ObjectMapper(); // json object mapper
-  private ServerSocket server_socket;
+  private ServerSocket server_socket; // server socket
 
   public Server(ServerSocket server_socket) { this.server_socket = server_socket; } // constructor which sets server socket
 
@@ -48,7 +43,7 @@ public class Server
     server.Start(); // start server
   }
 
-  public void Start() // start the server by initialising it and connecting new clients
+  public void Start() // start the server
   {
     try
     {
@@ -56,32 +51,22 @@ public class Server
       {
         Socket socket = server_socket.accept(); // wait for and accept incoming sockets
 
-        Client_Handler client_handler = new Client_Handler(socket);
-        Thread thread = new Thread(client_handler);
-        thread.start();
+        Client_Handler client_handler = new Client_Handler(socket); // create client handler instance for that socket
+        Thread thread = new Thread(client_handler); // create thread for that client handler
+        thread.start(); // start the thread
       }
     }
-    catch (IOException error) { Stop(); }
+    catch (IOException error) { Stop(); } // if any errors occour, gracefully stop
   }
 
   public void Stop() // stop the server gracefully to avoid errors
   {
-    try
-    {
-      if (server_socket != null) // avoid null pointer exceptions
-      {
-        server_socket.close(); // close the socket
-      }
-    }
-    catch (IOException error) { error.printStackTrace(); }
-  }
-
-  static void Add_Channel()
-  {
+    try { if (server_socket != null) { server_socket.close(); } } // if the server socket is not null, close the server socket
+    catch (IOException error) { error.printStackTrace(); } // if any errors occour, print them
   }
 }
 
-class Client_Handler implements Runnable
+class Client_Handler implements Runnable // implement runnable to allow instances of this object to run on threads
 {
   private final static String PATH = "log"; // constant log path string
   private static ObjectMapper mapper = new ObjectMapper(); // static object mapper used to map json strings to objects
@@ -92,7 +77,7 @@ class Client_Handler implements Runnable
   private BufferedWriter writer; // private writer to write to socket
   public String identity; // public identity for the client
   public ArrayList<String> subscribed_channels = new ArrayList<String>(); // array to keep track of channels the client has subscribed to
-  public ArrayList<String> message_board = new ArrayList<String>();
+  public ArrayList<String> message_board = new ArrayList<String>(); // array to keep track of messages published to the client
 
   public Client_Handler(Socket socket)
   {
@@ -101,6 +86,7 @@ class Client_Handler implements Runnable
       this.socket = socket; // set the given socket to socket
       this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // get the socket's input stream, create an input reader out of that stream, then create a buffered reader out of that reader 
       this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())); // get the socket's output stream, create an output writer out of that stream, then create a buffered writer out of that writer
+
     }
     catch (IOException error) { Stop(); } // if any errors occour, gracefully stop
   }
@@ -114,20 +100,20 @@ class Client_Handler implements Runnable
       try
       {
         json = reader.readLine(); // json is read from the client
-        if (json == null) { Stop(); break; }
+        if (json == null) { Stop(); break; } // if json is null, gracefully stop
 
         BufferedWriter log = new BufferedWriter(new FileWriter(PATH, true)); // open filewriter for a file specified by path and set it to autoflush
         String _class = mapper.readValue(json, Mask.class)._class; // isolate the _class attribute by masking the json string using mask object
 
-        if (_class.equals("OpenRequest")) { Open(json); } // if _class is open request, open the channel
-        if (_class.equals("PublishRequest")) { Publish(json); } // if _class is subscribe request then subscribe
-        if (_class.equals("SubscribeRequest")) { Subscribe(json); } // if _class is subscribe request then subscribe
-        if (_class.equals("GetRequest")) { Get(json); } // if _class is subscribe request then subscribe
+        if (_class.equals("OpenRequest")) { Open(json); } // if open request, open
+        if (_class.equals("PublishRequest")) { Publish(json); } // if publish request, publish 
+        if (_class.equals("SubscribeRequest")) { Subscribe(json); } // if subscribe request, subscribe
+        if (_class.equals("GetRequest")) { Get(json); } // if get request, get
 
         log.append(json + "\n"); // append the json and add line break to the json
         log.close(); // close the file
       }
-      catch (IOException error) { Stop(); break; }
+      catch (IOException error) { Stop(); break; } // if any errors occour, gracefully stop
     }
   }
 
@@ -140,7 +126,7 @@ class Client_Handler implements Runnable
       if (this.writer != null) { this.writer.close(); } // if the writer is not null, close it
       if (this.socket != null) { this.socket.close(); } // if the socket is not null, close it
     }
-    catch (IOException error) { error.printStackTrace(); }
+    catch (IOException error) { error.printStackTrace(); } // if any errors, occour, print them
   }
 
   void Open(String json) // open channel
@@ -152,7 +138,20 @@ class Client_Handler implements Runnable
       client_handlers.add(this); // track this client handler
       /* TODO: send success response to client */
     }
-    catch (JsonProcessingException error) {  }
+    catch (JsonProcessingException error) { /* TODO: send error response to client */ }
+    try
+    {
+      BufferedReader log = new BufferedReader(new FileReader(PATH)); // create buffered reader from file reader of specified file
+      String line; // null string to contain lines
+      while ((line = log.readLine()) != null) // start the reader, while current line is not null
+      {
+        String _class = mapper.readValue(line, Mask.class)._class; // isolate the _class attribute by masking the json string using mask object
+        if (_class.equals("PublishRequest")) { Publish(line); } // if publish request, publish
+        if (_class.equals("SubscribeRequest")) { Subscribe(line); } // if subscribe request, subscribe
+      }
+      log.close(); // close the log
+    }
+    catch (IOException errors) { Stop(); } // if any errors occour, gracefully stop
   }
 
   void Publish(String json)
@@ -193,7 +192,7 @@ class Client_Handler implements Runnable
         Error_Response  error_response = new Error_Response(); // create new error response
         error_response._class = "ErrorResponse"; // set _class to error response
         error_response.error = "NO SUCH CHANNEL:" + ' ' + channel; // report that there's no such channel
-        System.out.println(mapper.writeValueAsString(error_response)); // FIXME: write the response as opposed to send it
+        System.out.println(mapper.writeValueAsString(error_response)); // FIXME: send the response as opposed to write it
       }
     }
     catch (JsonProcessingException error) { /* TODO: send error response to client */ }
