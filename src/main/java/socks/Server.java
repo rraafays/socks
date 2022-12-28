@@ -117,8 +117,9 @@ class Client_Handler implements Runnable
         log.append(json + "\n"); // append the json and add line break to the json
         log.close(); // close the file
         
-        if (mapper.readValue(json, Mask.class)._class.equals("OpenRequest")) { Open(json); } // if _class is open request, open the channel
-        if (mapper.readValue(json, Mask.class)._class.equals("SubscribeRequest")) { Subscribe(json); } // if _class is subscribe request then subscribe
+        String _class = mapper.readValue(json, Mask.class)._class; // isolate the _class attribute by masking the json string using mask object
+        if (_class.equals("OpenRequest")) { Open(json); } // if _class is open request, open the channel
+        if (_class.equals("SubscribeRequest")) { Subscribe(json); } // if _class is subscribe request then subscribe
       }
       catch (IOException error) { /* TODO: method to stop client handler */ break; }
     }
