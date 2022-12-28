@@ -97,6 +97,7 @@ public class Client
   static String Get() // build get request
   {
     Get_Request get_request = new Get_Request(); // create get request object
+    get_request._class = "GetRequest";
     get_request.identity = identity; // set identity
     get_request.after = 0; // FIXME: set current time as opposed to just 0
 
