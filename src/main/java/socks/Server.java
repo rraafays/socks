@@ -92,6 +92,7 @@ class Client_Handler implements Runnable
   private BufferedWriter writer; // private writer to write to socket
   public String identity; // public identity for the client
   public ArrayList<String> subscribed_channels = new ArrayList<String>(); // array to keep track of channels the client has subscribed to
+  public ArrayList<String> message_board = new ArrayList<String>();
 
   public Client_Handler(Socket socket)
   {
@@ -119,7 +120,9 @@ class Client_Handler implements Runnable
         String _class = mapper.readValue(json, Mask.class)._class; // isolate the _class attribute by masking the json string using mask object
 
         if (_class.equals("OpenRequest")) { Open(json); } // if _class is open request, open the channel
+        if (_class.equals("PublishRequest")) { Publish(json); } // if _class is subscribe request then subscribe
         if (_class.equals("SubscribeRequest")) { Subscribe(json); } // if _class is subscribe request then subscribe
+        if (_class.equals("GetRequest")) { Get(json); } // if _class is subscribe request then subscribe
 
         log.append(json + "\n"); // append the json and add line break to the json
         log.close(); // close the file
@@ -147,8 +150,26 @@ class Client_Handler implements Runnable
       this.identity = mapper.readValue(json, Open_Request.class).identity; // set the identity of the client handler to specified identity
       subscribed_channels.add(identity); // subscribe to itself
       client_handlers.add(this); // track this client handler
+      /* TODO: send success response to client */
     }
     catch (JsonProcessingException error) {  }
+  }
+
+  void Publish(String json)
+  {
+    try
+    {
+      Publish_Request publish_request = mapper.readValue(json, Publish_Request.class); // read publish request
+      for (Client_Handler client_handler : client_handlers) // for each client handler in client handlers
+      {
+        if (client_handler.identity.equals(publish_request.identity)) // if the client handler's identity is equal to the specified publish request identity
+        {
+          client_handler.message_board.add(mapper.writeValueAsString(publish_request.message)); // add the message specified in the publish request to their message board
+        }
+      }
+      /* TODO: send success response to client */
+    }
+    catch (JsonProcessingException error) { /* TODO: send error response to client */ }
   }
 
   void Subscribe(String json) // subscribe to channel
@@ -164,6 +185,7 @@ class Client_Handler implements Runnable
         { 
           subscribed_channels.add(client_handler.identity); // subscribe to it by adding it to subscribed channels
           found = true; // set found to true
+          /* TODO: send success response to client */
         }
       }
       if (!found) // if the channel has not been found
@@ -174,17 +196,18 @@ class Client_Handler implements Runnable
         System.out.println(mapper.writeValueAsString(error_response)); // FIXME: write the response as opposed to send it
       }
     }
-    catch (JsonProcessingException error) { /* TODO: send success response to client */ }
+    catch (JsonProcessingException error) { /* TODO: send error response to client */ }
   }
 
   void Get(String json) // get messages
   {
-    try 
+    for (Client_Handler client_handler : client_handlers) // for each client handler in client handlers
     {
-      writer.write("test"); // FIXME: send message list response as opposed to just sending test
-      writer.newLine(); // send newline
-      writer.flush(); // flush the buffer
+      if (subscribed_channels.contains(client_handler.identity)) // if subscribed to the channel
+      {
+        for (String string : client_handler.message_board) { System.out.println(string); } /* TODO: add to send message list response as opposed to just writing each message on the server */
+      }
     }
-    catch (IOException error) {  }
+    /* TODO: send message list response to client */
   }
 }
