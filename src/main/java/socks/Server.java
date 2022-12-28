@@ -101,7 +101,7 @@ class Client_Handler implements Runnable
       this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // get the socket's input stream, create an input reader out of that stream, then create a buffered reader out of that reader 
       this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())); // get the socket's output stream, create an output writer out of that stream, then create a buffered writer out of that writer
     }
-    catch (IOException error) { /* TODO: method to stop client handler */ } // if any errors occour, gracefully close
+    catch (IOException error) { Stop(); } // if any errors occour, gracefully stop
   }
 
   @Override // override run method of client handler class since it is runnable
@@ -113,16 +113,31 @@ class Client_Handler implements Runnable
       try
       {
         json = reader.readLine(); // json is read from the client
+        if (json == null) { Stop(); break; }
+
         BufferedWriter log = new BufferedWriter(new FileWriter(PATH, true)); // open filewriter for a file specified by path and set it to autoflush
-        log.append(json + "\n"); // append the json and add line break to the json
-        log.close(); // close the file
-        
         String _class = mapper.readValue(json, Mask.class)._class; // isolate the _class attribute by masking the json string using mask object
+
         if (_class.equals("OpenRequest")) { Open(json); } // if _class is open request, open the channel
         if (_class.equals("SubscribeRequest")) { Subscribe(json); } // if _class is subscribe request then subscribe
+
+        log.append(json + "\n"); // append the json and add line break to the json
+        log.close(); // close the file
       }
-      catch (IOException error) { /* TODO: method to stop client handler */ break; }
+      catch (IOException error) { Stop(); break; }
     }
+  }
+
+  void Stop()
+  {
+    client_handlers.remove(this); // remove this client handler from the client handlers array
+    try
+    {
+      if (this.reader != null) { this.reader.close(); } // if the reader is not null, close it
+      if (this.writer != null) { this.writer.close(); } // if the writer is not null, close it
+      if (this.socket != null) { this.socket.close(); } // if the socket is not null, close it
+    }
+    catch (IOException error) { error.printStackTrace(); }
   }
 
   void Open(String json) // open channel
