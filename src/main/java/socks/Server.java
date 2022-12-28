@@ -125,7 +125,7 @@ class Client_Handler implements Runnable
     }
   }
 
-  void Open(String json)
+  void Open(String json) // open channel
   {
     try
     {
@@ -160,5 +160,16 @@ class Client_Handler implements Runnable
       }
     }
     catch (JsonProcessingException error) { /* TODO: send success response to client */ }
+  }
+
+  void Get(String json) // get messages
+  {
+    try 
+    {
+      writer.write("test"); // FIXME: send message list response as opposed to just sending test
+      writer.newLine(); // send newline
+      writer.flush(); // flush the buffer
+    }
+    catch (IOException error) {  }
   }
 }
