@@ -79,7 +79,7 @@ public class Client
     publish_request.message.when = 0; // FIXME: set current time as opposed to just 0
     publish_request.message.body = message; // set body
 
-    try { return(mapper.writeValueAsString(publish_request)); }
+    try { return(mapper.writeValueAsString(publish_request)); } // try to return the publish request as json string
     catch (JsonProcessingException error) { return(""); } // if any errors occour, return an empty string
   }
 
@@ -96,6 +96,11 @@ public class Client
 
   static String Get() // build get request
   {
-    return("3 is not implemented!");
+    Get_Request get_request = new Get_Request(); // create get request object
+    get_request.identity = identity; // set identity
+    get_request.after = 0; // FIXME: set current time as opposed to just 0
+
+    try { return(mapper.writeValueAsString(get_request)); } // try to return the get request as json string
+    catch (JsonProcessingException error) { return(""); } // if any errors occour, return an empty string
   }
 }
