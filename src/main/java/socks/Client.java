@@ -44,7 +44,14 @@ public class Client
       ShowMenu(); // main menu: 1 for publish, 2 for subscribe, 3 for getting messages
       
       String option = client.readLine(); // grab an argument number from the client's input
-      if (option.equals("1")) { server.println(Publish()); } // if option is 1 then publish
+      if (option.equals("1")) // if option is 1 then publish
+      {
+        System.out.println("Who's channel would you like to publish on? ");
+        String channel = client.readLine();
+        System.out.println("What would you like to say? ");
+        String message = client.readLine();
+        server.println(Publish(channel, message));
+      }
       if (option.equals("2")) // if option is 2 then subscribe
       { 
         System.out.println("Who would you like to subscribe to? "); // ask user who they would like to subscribe to
@@ -61,9 +68,19 @@ public class Client
     System.out.println("[3] Get Messages");
   }
 
-  static String Publish() // build publish request
+  static String Publish(String channel, String message) // build publish request
   {
-    return("1 is not implemented!");
+    Publish_Request publish_request = new Publish_Request(); // create publish request object
+    publish_request._class = "PublishRequest"; // set the _class 
+    publish_request.identity = channel; // set the identity to specified channel
+    publish_request.message = new Message(); // create new message
+    publish_request.message._class = "Message"; // set the _class
+    publish_request.message.from = identity; // set from to identity
+    publish_request.message.when = 0; // FIXME: set current time as opposed to just 0
+    publish_request.message.body = message; // set body
+
+    try { return(mapper.writeValueAsString(publish_request)); }
+    catch (JsonProcessingException error) { return(""); } // if any errors occour, return an empty string
   }
 
   static String Subscribe(String channel) // build subscribe request
