@@ -21,7 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 // object used to mask json strings to determine their _class attribute
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Mask { public String _class; } // E.G: if (mask._class.equals("OpenRequest")) { Add_Channel(request_json, client_handler); }
+class Mask { public String _class; public String identity; } // E.G: if (mask._class.equals("OpenRequest")) { Add_Channel(request_json, client_handler); }
 // objects to map json sent by the client into
 class Message { public String _class; public String from; public int when; public String body; }
 class Open_Request { public String _class; public String identity; }
@@ -145,9 +145,13 @@ class Client_Handler implements Runnable // implement runnable to allow instance
       String line; // null string to contain lines
       while ((line = log.readLine()) != null) // start the reader, while current line is not null
       {
-        String _class = mapper.readValue(line, Mask.class)._class; // isolate the _class attribute by masking the json string using mask object
-        if (_class.equals("PublishRequest")) { Publish(line); } // if publish request, publish
-        if (_class.equals("SubscribeRequest")) { Subscribe(line); } // if subscribe request, subscribe
+        String _class = mapper.readValue(line, Mask.class)._class; // isolate the _class attribute by masking the json string
+        String identity = mapper.readValue(line,Mask.class).identity; // isolate the identity attribute by masking the json string
+        if (this.identity.equals(identity)) // if the identity contained in the json string matches client handler's identity
+        {
+          if (_class.equals("PublishRequest")) { Publish(line); } // if publish request, publish
+          if (_class.equals("SubscribeRequest")) { Subscribe(line); } // if subscribe request, subscribe
+        }
       }
       log.close(); // close the log
     }
