@@ -79,9 +79,9 @@ class Client_Handler implements Runnable // implement runnable to allow instance
   public String identity; // public identity for the client
   public ArrayList<String> subscribed_channels = new ArrayList<String>(); // array to keep track of channels the client has subscribed to
   public ArrayList<String> message_board = new ArrayList<String>(); // array to keep track of messages published to the client
-  public boolean open;
+  public boolean open; // boolean to tell if client is ready to receive responses
 
-  public Client_Handler(Socket socket)
+  public Client_Handler(Socket socket) // client handler constructor
   {
     try
     {
@@ -175,13 +175,13 @@ class Client_Handler implements Runnable // implement runnable to allow instance
           client_handler.message_board.add(mapper.writeValueAsString(publish_request.message)); // add the message specified in the publish request to their message board
         }
       }
-      if (open)
+      if (open) // if the client is open
       {
         try 
         {
           writer.write("publish");
-          writer.newLine();
-          writer.flush();
+          writer.newLine(); // write newline to the client
+          writer.flush(); // manually flush the writer to make sure it is ready to be used again
         }
         catch (IOException error) { error.printStackTrace(); }
       }
@@ -212,13 +212,13 @@ class Client_Handler implements Runnable // implement runnable to allow instance
         error_response.error = "NO SUCH CHANNEL:" + ' ' + channel; // report that there's no such channel
         System.out.println(mapper.writeValueAsString(error_response)); // FIXME: send the response as opposed to write it
       }
-      if (open)
+      if (open) // if the client is open
       {
         try 
         {
           writer.write("subscribe");
-          writer.newLine();
-          writer.flush();
+          writer.newLine(); // write newline to the client
+          writer.flush(); // manually flush the writer to make sure it is ready to be used again
         }
         catch (IOException error) { error.printStackTrace(); }
       }
@@ -231,14 +231,14 @@ class Client_Handler implements Runnable // implement runnable to allow instance
     try
     {
       String channel = mapper.readValue(json, Unsubscribe_Request.class).channel; // make string called channel which stores the channel provided by the json string
-      subscribed_channels.remove(channel);
-      if (open)
+      subscribed_channels.remove(channel); // remove the specified channel from the subscribed channels list of the client
+      if (open) // if the client is open
       {
         try 
         {
           writer.write("unsubscribe");
-          writer.newLine();
-          writer.flush();
+          writer.newLine(); // write newline to the client
+          writer.flush(); // manually flush the writer to make sure it is ready to be used again
         }
         catch (IOException error) { error.printStackTrace(); }
       }
@@ -258,8 +258,8 @@ class Client_Handler implements Runnable // implement runnable to allow instance
     try 
     {
       writer.write("get");
-      writer.newLine();
-      writer.flush();
+      writer.newLine(); // write newline to the client
+      writer.flush(); // manually flush the writer to make sure it is ready to be used again
     }
     catch (IOException error) { error.printStackTrace(); }
   }
