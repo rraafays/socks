@@ -175,7 +175,7 @@ class Client_Handler implements Runnable // implement runnable to allow instance
       }
       try 
       {
-        writer.write("test");
+        writer.write("publish");
         writer.newLine();
         writer.flush();
       }
@@ -208,6 +208,13 @@ class Client_Handler implements Runnable // implement runnable to allow instance
         error_response.error = "NO SUCH CHANNEL:" + ' ' + channel; // report that there's no such channel
         System.out.println(mapper.writeValueAsString(error_response)); // FIXME: send the response as opposed to write it
       }
+      try 
+      {
+        writer.write("subscribe");
+        writer.newLine();
+        writer.flush();
+      }
+      catch (IOException error) { error.printStackTrace(); }
     }
     catch (JsonProcessingException error) { /* TODO: send error response to client */ }
   }
@@ -218,6 +225,13 @@ class Client_Handler implements Runnable // implement runnable to allow instance
     {
       String channel = mapper.readValue(json, Unsubscribe_Request.class).channel; // make string called channel which stores the channel provided by the json string
       subscribed_channels.remove(channel);
+      try 
+      {
+        writer.write("unsubscribe");
+        writer.newLine();
+        writer.flush();
+      }
+    catch (IOException error) { error.printStackTrace(); }
     }
     catch (JsonProcessingException error) { /* TODO: send error response to client */ }
   }
@@ -231,6 +245,13 @@ class Client_Handler implements Runnable // implement runnable to allow instance
         for (String string : client_handler.message_board) { System.out.println(string); } /* TODO: add to send message list response as opposed to just writing each message on the server */
       }
     }
+    try 
+    {
+      writer.write("get");
+      writer.newLine();
+      writer.flush();
+    }
+    catch (IOException error) { error.printStackTrace(); }
     /* TODO: send message list response to client */
   }
 }
