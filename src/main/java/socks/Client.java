@@ -11,7 +11,6 @@ import java.io.BufferedWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 // jackson library
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -23,6 +22,7 @@ class Message_List_Response { public String _class; public Message[] messages; }
 public class Client
 {
   private static ObjectMapper mapper = new ObjectMapper(); // json object mapper
+  private static Scanner scanner = new Scanner(System.in);
   private final static String ADDR = "localhost"; // constant address string
   private final static int PORT = 12345; // constant port number
   private Socket socket;
@@ -44,7 +44,6 @@ public class Client
 
   public static void main(String[] args) throws IOException
   {
-    Scanner scanner = new Scanner(System.in);
     Socket socket = new Socket(ADDR, PORT); // create a new socket and connect to ADDR:PORT (localhost:12345)
     System.out.println("Enter identity: "); // prompt client for an identity
     String identity = scanner.nextLine();
@@ -58,35 +57,13 @@ public class Client
 
     while (true) // infinite while loop
     {
-      ShowMenu(); // main menu: 1 for publish, 2 for subscribe, 3 for getting messages
+      ShowMenu(); 
       
       String option = scanner.nextLine(); // grab an argument number from the client's input
-      if (option.equals("1")) // if option is 1 then publish
-      {
-        System.out.println("\u001B[35mWho's channel would you like to publish on? \u001B[0m");
-        String channel = scanner.nextLine();
-        System.out.println("\u001B[35mWhat would you like to say? \u001B[0m");
-        String message = scanner.nextLine();
-        client.writer.write(client.Publish(channel, message));
-        client.writer.newLine();
-        client.writer.flush();
-        client.Receive_Response();
-      }
-      if (option.equals("2")) // if option is 2 then subscribe
-      { 
-        System.out.println("\u001B[36mWho would you like to subscribe to? \u001B[0m"); // ask user who they would like to subscribe to
-        client.writer.write(client.Subscribe(scanner.nextLine())); // print subscribe request to the server where whatever they type is the channel they wish to subscribe to
-        client.writer.newLine();
-        client.writer.flush();
-      } 
-      if (option.equals("3")) // if option is 2 then subscribe
-      { 
-        System.out.println("\u001B[31mWho would you like to unsubscribe from? \u001B[0m"); // ask user who they would like to subscribe to
-        client.writer.write(client.Unsubscribe(scanner.nextLine())); // print unsubscribe request to the server where whatever they type is the channel they wish to unsubscribe from
-        client.writer.newLine();
-        client.writer.flush();
-      } 
-      if (option.equals("4")) { client.writer.write(client.Get()); client.writer.newLine(); client.writer.flush(); } // if option is 3 then get messages
+      if (option.equals("1")) { client.Publish(); client.Receive_Response(); } // if option is 1, publish then await response
+      if (option.equals("2")) { client.Subscribe(); client.Receive_Response(); } // if option is 2, subscribe then await response
+      if (option.equals("3")) { client.Unsubscribe(); client.Receive_Response(); } // if option is 3, unsubscribe then await response
+      if (option.equals("4")) { client.Get(); client.Receive_Response(); } // if option is 4, get messages then await response
     }
   }
 
@@ -117,8 +94,13 @@ public class Client
     catch (IOException error) { Stop(); }
   }
 
-  String Publish(String channel, String message) // build publish request
+  void Publish() // build publish request
   {
+    System.out.println("\u001B[35mWho's channel would you like to publish on? \u001B[0m");
+    String channel = scanner.nextLine();
+    System.out.println("\u001B[35mWhat would you like to say? \u001B[0m");
+    String message = scanner.nextLine();
+
     Publish_Request publish_request = new Publish_Request(); // create publish request object
     publish_request._class = "PublishRequest"; // set the _class 
     publish_request.identity = channel; // set the identity to specified channel
@@ -128,40 +110,66 @@ public class Client
     publish_request.message.when = 0; // FIXME: set current time as opposed to just 0
     publish_request.message.body = message; // set body
 
-    try { return(mapper.writeValueAsString(publish_request)); } // try to return the publish request as json string
-    catch (JsonProcessingException error) { return(""); } // if any errors occour, return an empty string
+    try 
+    { 
+      this.writer.write(mapper.writeValueAsString(publish_request));
+      this.writer.newLine();
+      this.writer.flush();
+    } 
+    catch (IOException error) { Stop(); } // if any errors occour, gracefully stop
   }
 
-  String Subscribe(String channel) // build subscribe request
+  void Subscribe() // build subscribe request
   {
+    System.out.println("\u001B[36mWho would you like to subscribe to? \u001B[0m"); // ask user who they would like to subscribe to
+    String channel = scanner.nextLine();
+
     Subscribe_Request subscribe_request = new Subscribe_Request(); // create subscribe request object
     subscribe_request._class = "SubscribeRequest"; // set the _class
     subscribe_request.identity = this.identity; // set identity
     subscribe_request.channel = channel; // set channel
     
-    try { return(mapper.writeValueAsString(subscribe_request)); } // try to return the subscribe request as json string
-    catch (JsonProcessingException error) { return(""); } // if any errors occour, return an empty string
+    try 
+    { 
+      this.writer.write(mapper.writeValueAsString(subscribe_request));
+      this.writer.newLine();
+      this.writer.flush();
+    } 
+    catch (IOException error) { Stop(); } // if any errors occour, gracefully stop
   }
 
-  String Unsubscribe(String channel) // build unsubscribe request
+  void Unsubscribe() // build unsubscribe request
   {
+    System.out.println("\u001B[31mWho would you like to unsubscribe from? \u001B[0m"); // ask user who they would like to unsubscribe from
+    String channel = scanner.nextLine();
+
     Unsubscribe_Request unsubscribe_request = new Unsubscribe_Request(); // create unsubscribe request object
     unsubscribe_request._class = "UnsubscribeRequest"; // set the _class
     unsubscribe_request.identity = this.identity;
     unsubscribe_request.channel = channel;
 
-    try { return(mapper.writeValueAsString(unsubscribe_request)); } // try to return the unsubscribe request as json string
-    catch (JsonProcessingException error) { return(""); } // if any errors occour, return an empty string
+    try 
+    { 
+      this.writer.write(mapper.writeValueAsString(unsubscribe_request));
+      this.writer.newLine();
+      this.writer.flush();
+    } 
+    catch (IOException error) { Stop(); } // if any errors occour, gracefully stop
   }
 
-  String Get() // build get request
+  void Get() // build get request
   {
     Get_Request get_request = new Get_Request(); // create get request object
     get_request._class = "GetRequest";
     get_request.identity = this.identity; // set identity
     get_request.after = 0; // FIXME: set current time as opposed to just 0
 
-    try { return(mapper.writeValueAsString(get_request)); } // try to return the get request as json string
-    catch (JsonProcessingException error) { return(""); } // if any errors occour, return an empty string
+    try 
+    { 
+      this.writer.write(mapper.writeValueAsString(get_request));
+      this.writer.newLine();
+      this.writer.flush();
+    } 
+    catch (IOException error) { Stop(); } // if any errors occour, gracefully stop
   }
 }
