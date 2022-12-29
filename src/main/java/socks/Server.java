@@ -27,6 +27,7 @@ class Message { public String _class; public String from; public int when; publi
 class Open_Request { public String _class; public String identity; }
 class Publish_Request { public String _class; public String identity; public Message message; }
 class Subscribe_Request { public String _class; public String identity; public String channel; }
+class Unsubscribe_Request { public String _class; public String identity; public String channel; }
 class Get_Request { public String _class; public String identity; public int after; }
 
 public class Server
@@ -108,6 +109,7 @@ class Client_Handler implements Runnable // implement runnable to allow instance
         if (_class.equals("OpenRequest")) { Open(json); } // if open request, open
         if (_class.equals("PublishRequest")) { Publish(json); } // if publish request, publish 
         if (_class.equals("SubscribeRequest")) { Subscribe(json); } // if subscribe request, subscribe
+        if (_class.equals("UnsubscribeRequest")) { Unsubscribe(json); } // if subscribe request, subscribe
         if (_class.equals("GetRequest")) { Get(json); } // if get request, get
 
         log.append(json + "\n"); // append the json and add line break to the json
@@ -198,6 +200,16 @@ class Client_Handler implements Runnable // implement runnable to allow instance
         error_response.error = "NO SUCH CHANNEL:" + ' ' + channel; // report that there's no such channel
         System.out.println(mapper.writeValueAsString(error_response)); // FIXME: send the response as opposed to write it
       }
+    }
+    catch (JsonProcessingException error) { /* TODO: send error response to client */ }
+  }
+
+  void Unsubscribe(String json) // subscribe to channel
+  {
+    try
+    {
+      String channel = mapper.readValue(json, Unsubscribe_Request.class).channel; // make string called channel which stores the channel provided by the json string
+      subscribed_channels.remove(channel);
     }
     catch (JsonProcessingException error) { /* TODO: send error response to client */ }
   }
