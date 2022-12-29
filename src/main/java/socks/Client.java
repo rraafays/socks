@@ -57,13 +57,18 @@ public class Client
         System.out.println("\u001B[36mWho would you like to subscribe to? \u001B[0m"); // ask user who they would like to subscribe to
         server.println(Subscribe(client.readLine())); // print subscribe request to the server where whatever they type is the channel they wish to subscribe to
       } 
-      if (option.equals("3")) { server.println(Get()); } // if option is 3 then get messages
+      if (option.equals("3")) // if option is 2 then subscribe
+      { 
+        System.out.println("\u001B[31mWho would you like to unsubscribe from? \u001B[0m"); // ask user who they would like to subscribe to
+        server.println(Unsubscribe(client.readLine())); // print subscribe request to the server where whatever they type is the channel they wish to subscribe to
+      } 
+      if (option.equals("4")) { server.println(Get()); } // if option is 3 then get messages
     }
   }
 
   static void ShowMenu() // print options menu
   {
-    System.out.println("[1] \u001B[35mPublish\u001B[0m, [2] \u001B[36mSubscribe\u001B[0m, [3] \u001B[33mGet Messages\u001B[0m");
+    System.out.println("[1] \u001B[35mPublish\u001B[0m, [2] \u001B[36mSubscribe\u001B[0m, [3] \u001B[31mUnsubscribe\u001B[0m, [4] \u001B[33mGet Messages\u001B[0m");
   }
 
   static String Publish(String channel, String message) // build publish request
@@ -89,6 +94,17 @@ public class Client
     subscribe_request.channel = channel; // set channel
     
     try { return(mapper.writeValueAsString(subscribe_request)); } // try to return the subscribe request as json string
+    catch (JsonProcessingException error) { return(""); } // if any errors occour, return an empty string
+  }
+
+  static String Unsubscribe(String channel) // build unsubscribe request
+  {
+    Unsubscribe_Request unsubscribe_request = new Unsubscribe_Request(); // create unsubscribe request object
+    unsubscribe_request._class = "UnsubscribeRequest"; // set the _class
+    unsubscribe_request.identity = identity;
+    unsubscribe_request.channel = channel;
+
+    try { return(mapper.writeValueAsString(unsubscribe_request)); } // try to return the unsubscribe request as json string
     catch (JsonProcessingException error) { return(""); } // if any errors occour, return an empty string
   }
 
