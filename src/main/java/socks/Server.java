@@ -187,7 +187,7 @@ class Client_Handler implements Runnable // implement runnable to allow instance
       if (open) // if the client is open
       {
         Success_Response success_response = new Success_Response(); // create new success response
-        success_response._class = "Success_Response"; // set the _class
+        success_response._class = "SuccessResponse"; // set the _class
         writer.write(mapper.writeValueAsString(success_response)); // write the success response to the client
         writer.newLine(); // write newline to the client
         writer.flush(); // manually flush the writer to make sure it is ready to be used again

@@ -89,7 +89,8 @@ public class Client
     try
     {
       json = reader.readLine(); // try to read from the server into our json variable
-      System.out.println(json); /* FIXME: interpret the response as opposed to just printing it */
+      if (mapper.readValue(json, Mask.class)._class.equals("SuccessResponse")) { System.out.println("\u001B[32mRequest succeeded!\u001B[0m"); } // if the _class is success response, tell user request succeeded
+      if (mapper.readValue(json, Mask.class)._class.equals("ErrorResponse")) { System.out.println("\u001B[31m" + mapper.readValue(json, Error_Response.class).error + "\u001B[0m"); } // if the _class is error response, tell user reason
     }
     catch (IOException error) { Stop(); } // if any errors, occour, gracefully stop
   }
