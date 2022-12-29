@@ -163,6 +163,39 @@ class Client_Handler implements Runnable // implement runnable to allow instance
     catch (IOException errors) { Stop(); } // if any errors occour, gracefully stop
   }
 
+  void Respond_Error(String reason) // send error response
+  {
+    try 
+    {
+      if (open) // if the client is open
+      {
+        Error_Response error_response = new Error_Response(); // create new error response
+        error_response._class = "ErrorResponse"; // set the _class
+        error_response.error = reason; // set error to reason
+        writer.write(mapper.writeValueAsString(error_response)); // write the error response to the client
+        writer.newLine(); // write newline to the client
+        writer.flush(); // manually flush the writer to make sure it is ready to be used again
+      }
+    }
+    catch (IOException error) { error.printStackTrace(); }
+  }
+  
+  void Respond_Success() // send success response
+  {
+    try 
+    {
+      if (open) // if the client is open
+      {
+        Success_Response success_response = new Success_Response(); // create new success response
+        success_response._class = "Success_Response"; // set the _class
+        writer.write(mapper.writeValueAsString(success_response)); // write the success response to the client
+        writer.newLine(); // write newline to the client
+        writer.flush(); // manually flush the writer to make sure it is ready to be used again
+      }
+    }
+    catch (IOException error) { error.printStackTrace(); }
+  }
+
   void Publish(String json)
   {
     try
@@ -175,18 +208,9 @@ class Client_Handler implements Runnable // implement runnable to allow instance
           client_handler.message_board.add(mapper.writeValueAsString(publish_request.message)); // add the message specified in the publish request to their message board
         }
       }
-      if (open) // if the client is open
-      {
-        try 
-        {
-          writer.write("publish");
-          writer.newLine(); // write newline to the client
-          writer.flush(); // manually flush the writer to make sure it is ready to be used again
-        }
-        catch (IOException error) { error.printStackTrace(); }
-      }
+      Respond_Success(); // send success response
     }
-    catch (JsonProcessingException error) { /* TODO: send error response to client */ }
+    catch (JsonProcessingException error) { Respond_Error("MESSAGE TOO BIG"); } // if json fails to process, send error response with the message being too big to encode as the reason
   }
 
   void Subscribe(String json) // subscribe to channel
@@ -202,48 +226,33 @@ class Client_Handler implements Runnable // implement runnable to allow instance
         { 
           subscribed_channels.add(client_handler.identity); // subscribe to it by adding it to subscribed channels
           found = true; // set found to true
-          /* TODO: send success response to client */
+          Respond_Success(); // send success response
         }
       }
-      if (!found) // if the channel has not been found
-      {
-        Error_Response  error_response = new Error_Response(); // create new error response
-        error_response._class = "ErrorResponse"; // set _class to error response
-        error_response.error = "NO SUCH CHANNEL:" + ' ' + channel; // report that there's no such channel
-        System.out.println(mapper.writeValueAsString(error_response)); // FIXME: send the response as opposed to write it
-      }
-      if (open) // if the client is open
-      {
-        try 
-        {
-          writer.write("subscribe");
-          writer.newLine(); // write newline to the client
-          writer.flush(); // manually flush the writer to make sure it is ready to be used again
-        }
-        catch (IOException error) { error.printStackTrace(); }
-      }
+      if (!found) { Respond_Error("NO SUCH CHANNEL: " + channel); }
     }
-    catch (JsonProcessingException error) { /* TODO: send error response to client */ }
+    catch (JsonProcessingException error) { Stop(); }
   }
 
-  void Unsubscribe(String json) // subscribe to channel
+  void Unsubscribe(String json) // unsubscribe to channel
   {
     try
     {
       String channel = mapper.readValue(json, Unsubscribe_Request.class).channel; // make string called channel which stores the channel provided by the json string
-      subscribed_channels.remove(channel); // remove the specified channel from the subscribed channels list of the client
-      if (open) // if the client is open
+
+      boolean found = false;
+      for (Client_Handler client_handler : client_handlers) // for each client handler in client handlers
       {
-        try 
-        {
-          writer.write("unsubscribe");
-          writer.newLine(); // write newline to the client
-          writer.flush(); // manually flush the writer to make sure it is ready to be used again
+        if (client_handler.identity.equals(channel)) // if the client handler's identity matches the specified channel
+        { 
+          subscribed_channels.remove(client_handler.identity); // unsubscribe from it by removing it from subscribed channels
+          found = true; // set found to true
+          Respond_Success(); // send success response
         }
-        catch (IOException error) { error.printStackTrace(); }
       }
+      if (!found) { Respond_Error("NO SUCH CHANNEL: " + channel); }
     }
-    catch (JsonProcessingException error) { /* TODO: send error response to client */ }
+    catch (IOException error) { Stop(); }
   }
 
   void Get(String json) // get messages
@@ -255,12 +264,6 @@ class Client_Handler implements Runnable // implement runnable to allow instance
         for (String string : client_handler.message_board) { System.out.println(string); } /* TODO: add to send message list response as opposed to just writing each message on the server */
       }
     }
-    try 
-    {
-      writer.write("get");
-      writer.newLine(); // write newline to the client
-      writer.flush(); // manually flush the writer to make sure it is ready to be used again
-    }
-    catch (IOException error) { error.printStackTrace(); }
+    Respond_Success();
   }
 }

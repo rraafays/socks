@@ -69,7 +69,7 @@ public class Client
 
   static void ShowMenu() // print options menu
   {
-    System.out.println("[1] \u001B[35mPublish\u001B[0m, [2] \u001B[36mSubscribe\u001B[0m, [3] \u001B[31mUnsubscribe\u001B[0m, [4] \u001B[33mGet Messages\u001B[0m");
+    System.out.println("[1] \u001B[35mPublish\u001B[0m, [2] \u001B[34mSubscribe\u001B[0m, [3] \u001B[31mUnsubscribe\u001B[0m, [4] \u001B[33mGet Messages\u001B[0m");
   }
 
   void Stop() // stop the client
@@ -121,7 +121,7 @@ public class Client
 
   void Subscribe() // build subscribe request
   {
-    System.out.println("\u001B[36mWho would you like to subscribe to? \u001B[0m"); // prompt the user for the name of channel
+    System.out.println("\u001B[34mWho would you like to subscribe to? \u001B[0m"); // prompt the user for the name of channel
     String channel = scanner.nextLine(); // take the next line entered by the user as the specified channel
 
     Subscribe_Request subscribe_request = new Subscribe_Request(); // create subscribe request object
