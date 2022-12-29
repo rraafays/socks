@@ -173,6 +173,13 @@ class Client_Handler implements Runnable // implement runnable to allow instance
           client_handler.message_board.add(mapper.writeValueAsString(publish_request.message)); // add the message specified in the publish request to their message board
         }
       }
+      try 
+      {
+        writer.write("test");
+        writer.newLine();
+        writer.flush();
+      }
+      catch (IOException error) { error.printStackTrace(); }
       /* TODO: send success response to client */
     }
     catch (JsonProcessingException error) { /* TODO: send error response to client */ }
