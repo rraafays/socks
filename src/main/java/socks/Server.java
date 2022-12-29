@@ -109,7 +109,7 @@ class Client_Handler implements Runnable // implement runnable to allow instance
         if (_class.equals("OpenRequest")) { Open(json); } // if open request, open
         if (_class.equals("PublishRequest")) { Publish(json); } // if publish request, publish 
         if (_class.equals("SubscribeRequest")) { Subscribe(json); } // if subscribe request, subscribe
-        if (_class.equals("UnsubscribeRequest")) { Unsubscribe(json); } // if subscribe request, subscribe
+        if (_class.equals("UnsubscribeRequest")) { Unsubscribe(json); } // if unsubscribe request, unsubscribe
         if (_class.equals("GetRequest")) { Get(json); } // if get request, get
 
         log.append(json + "\n"); // append the json and add line break to the json
@@ -153,6 +153,7 @@ class Client_Handler implements Runnable // implement runnable to allow instance
         {
           if (_class.equals("PublishRequest")) { Publish(line); } // if publish request, publish
           if (_class.equals("SubscribeRequest")) { Subscribe(line); } // if subscribe request, subscribe
+          if (_class.equals("UnsubscribeRequest")) { Unsubscribe(line); } // if unsubscribe request, unsubscribe
         }
       }
       log.close(); // close the log
