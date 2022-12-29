@@ -46,15 +46,15 @@ public class Client
       String option = client.readLine(); // grab an argument number from the client's input
       if (option.equals("1")) // if option is 1 then publish
       {
-        System.out.println("Who's channel would you like to publish on? ");
+        System.out.println("\u001B[35mWho's channel would you like to publish on? \u001B[0m");
         String channel = client.readLine();
-        System.out.println("What would you like to say? ");
+        System.out.println("\u001B[35mWhat would you like to say? \u001B[0m");
         String message = client.readLine();
         server.println(Publish(channel, message));
       }
       if (option.equals("2")) // if option is 2 then subscribe
       { 
-        System.out.println("Who would you like to subscribe to? "); // ask user who they would like to subscribe to
+        System.out.println("\u001B[36mWho would you like to subscribe to? \u001B[0m"); // ask user who they would like to subscribe to
         server.println(Subscribe(client.readLine())); // print subscribe request to the server where whatever they type is the channel they wish to subscribe to
       } 
       if (option.equals("3")) { server.println(Get()); } // if option is 3 then get messages
@@ -63,9 +63,7 @@ public class Client
 
   static void ShowMenu() // print options menu
   {
-    System.out.println("[1] Publish");
-    System.out.println("[2] Subscribe");
-    System.out.println("[3] Get Messages");
+    System.out.println("[1] \u001B[35mPublish\u001B[0m, [2] \u001B[36mSubscribe\u001B[0m, [3] \u001B[33mGet Messages\u001B[0m");
   }
 
   static String Publish(String channel, String message) // build publish request
