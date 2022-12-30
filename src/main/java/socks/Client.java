@@ -44,27 +44,31 @@ public class Client
 
   public static void main(String[] args) throws IOException
   {
-    Socket socket = new Socket(ADDR, PORT); // create a new socket and connect to ADDR:PORT (localhost:12345)
-    System.out.println("Enter identity: "); // prompt client for an identity
-    String identity = scanner.nextLine(); // take the next line entered by the user as the client identity
-    Client client = new Client(socket, identity); // create an instance of client with the specific socket and identity
-
-    Open_Request open_request = new Open_Request(); // create new open request
-    open_request._class = "OpenRequest"; open_request.identity = identity; // initialise using client identity
-    client.writer.write(mapper.writeValueAsString(open_request)); // write the open request back to the server for it to interpret
-    client.writer.newLine(); // send new line to the server
-    client.writer.flush(); // manually flush the writer to make sure it is ready to be used again
-
-    while (true) // infinite while loop
+    try 
     {
-      ShowMenu(); // print the menu
-      
-      String option = scanner.nextLine(); // grab an argument number from the client's input
-      if (option.equals("1")) { client.Publish(); client.Receive_Response(); } // if option is 1, publish then await response
-      if (option.equals("2")) { client.Subscribe(); client.Receive_Response(); } // if option is 2, subscribe then await response
-      if (option.equals("3")) { client.Unsubscribe(); client.Receive_Response(); } // if option is 3, unsubscribe then await response
-      if (option.equals("4")) { client.Get(); client.Receive_Response(); } // if option is 4, get messages then await response
+      Socket socket = new Socket(ADDR, PORT); // create a new socket and connect to ADDR:PORT (localhost:12345)
+      System.out.println("Enter identity: "); // prompt client for an identity
+      String identity = scanner.nextLine(); // take the next line entered by the user as the client identity
+      Client client = new Client(socket, identity); // create an instance of client with the specific socket and identity
+
+      Open_Request open_request = new Open_Request(); // create new open request
+      open_request._class = "OpenRequest"; open_request.identity = identity; // initialise using client identity
+      client.writer.write(mapper.writeValueAsString(open_request)); // write the open request back to the server for it to interpret
+      client.writer.newLine(); // send new line to the server
+      client.writer.flush(); // manually flush the writer to make sure it is ready to be used again
+
+      while (true) // infinite while loop
+      {
+        ShowMenu(); // print the menu
+        
+        String option = scanner.nextLine(); // grab an argument number from the client's input
+        if (option.equals("1")) { client.Publish(); client.Receive_Response(); } // if option is 1, publish then await response
+        if (option.equals("2")) { client.Subscribe(); client.Receive_Response(); } // if option is 2, subscribe then await response
+        if (option.equals("3")) { client.Unsubscribe(); client.Receive_Response(); } // if option is 3, unsubscribe then await response
+        if (option.equals("4")) { client.Get(); client.Receive_Response(); } // if option is 4, get messages then await response
+      }
     }
+    catch (IOException error) { System.out.println("\u001B[31mstart the server first!\u001B[0m"); }
   }
 
   static void ShowMenu() // print options menu
