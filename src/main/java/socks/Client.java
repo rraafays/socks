@@ -9,6 +9,7 @@ import java.io.BufferedWriter;
 
 // network library
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 // jackson library
@@ -17,7 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 // objects to map json sent by the server into
 class Success_Response { public String _class; }
 class Error_Response { public String _class; public String error; }
-class Message_List_Response { public String _class; public Message[] messages; }
+class Message_List_Response { public String _class; public ArrayList<Message> messages; }
 
 public class Client
 {
@@ -93,8 +94,17 @@ public class Client
     try
     {
       json = reader.readLine(); // try to read from the server into our json variable
-      if (mapper.readValue(json, Mask.class)._class.equals("SuccessResponse")) { System.out.println("\u001B[32mRequest succeeded!\u001B[0m"); } // if the _class is success response, tell user request succeeded
-      if (mapper.readValue(json, Mask.class)._class.equals("ErrorResponse")) { System.out.println("\u001B[31m" + mapper.readValue(json, Error_Response.class).error + "\u001B[0m"); } // if the _class is error response, tell user reason
+      String _class = mapper.readValue(json, Mask.class)._class; // isolate the _class attribute by masking the json string using mask object
+      if (_class.equals("SuccessResponse")) { System.out.println("\u001B[32mRequest succeeded!\u001B[0m"); } // if the _class is success response, tell user request succeeded
+      if (_class.equals("ErrorResponse")) { System.out.println("\u001B[31m" + mapper.readValue(json, Error_Response.class).error + "\u001B[0m"); } // if the _class is error response, tell user reason
+      if (_class.equals("MessageListResponse"))
+      {  
+        Message_List_Response message_list_response = mapper.readValue(json, Message_List_Response.class);
+        for (Message message : message_list_response.messages)
+        {
+          System.out.println(message.from + ':' + ' ' + message.body);
+        }
+      }
     }
     catch (IOException error) { Stop(); } // if any errors, occour, gracefully stop
   }
