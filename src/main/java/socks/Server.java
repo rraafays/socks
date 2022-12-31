@@ -78,7 +78,7 @@ class Client_Handler implements Runnable // implement runnable to allow instance
   private BufferedWriter writer; // private writer to write to socket
   public String identity; // public identity for the client
   public ArrayList<String> subscribed_channels = new ArrayList<String>(); // array to keep track of channels the client has subscribed to
-  public ArrayList<String> message_board = new ArrayList<String>(); // array to keep track of messages published to the client
+  public ArrayList<Message> message_board = new ArrayList<Message>(); // array to keep track of messages published to the client
   public boolean open; // boolean to tell if client is ready to receive responses
 
   public Client_Handler(Socket socket) // client handler constructor
@@ -195,6 +195,23 @@ class Client_Handler implements Runnable // implement runnable to allow instance
     catch (IOException error) { Stop(); } // if any errors occour, gracefully stop
   }
 
+  void Respond_MessageList(ArrayList<Message> messages) // send message list response
+  {
+    try
+    {
+      if (open)
+      {
+        Message_List_Response message_list_response = new Message_List_Response(); // create new message list response
+        message_list_response._class = "MessageListResponse"; // set the _class
+        message_list_response.messages = messages; // set the messages of the reponse to the provided messages
+        writer.write(mapper.writeValueAsString(message_list_response)); // write the message list response to the client
+        writer.newLine(); // write newline to the client
+        writer.flush(); // manually flush the writer to make sure it is ready to be used again
+      }
+    }
+    catch (IOException error) { Stop(); } // if any errors occour, gracefully stop
+  }
+
   void Publish(String json)
   {
     try
@@ -204,7 +221,7 @@ class Client_Handler implements Runnable // implement runnable to allow instance
       {
         if (client_handler.identity.equals(publish_request.identity)) // if the client handler's identity is equal to the specified publish request identity
         {
-          client_handler.message_board.add(mapper.writeValueAsString(publish_request.message)); // add the message specified in the publish request to their message board
+          client_handler.message_board.add(publish_request.message); // add the message specified in the publish request to their message board
         }
       }
       Respond_Success(); // send success response
@@ -256,13 +273,14 @@ class Client_Handler implements Runnable // implement runnable to allow instance
 
   void Get(String json) // get messages
   {
+    ArrayList<Message> messages = new ArrayList<Message>();
     for (Client_Handler client_handler : client_handlers) // for each client handler in client handlers
     {
       if (subscribed_channels.contains(client_handler.identity)) // if subscribed to the channel
       {
-        for (String string : client_handler.message_board) { System.out.println(string); } /* TODO: add to send message list response as opposed to just writing each message on the server */
+        for (Message message : client_handler.message_board) { messages.add(message); }
       }
     }
-    Respond_Success(); // send success response
+    Respond_MessageList(messages);
   }
 }
