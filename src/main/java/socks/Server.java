@@ -139,9 +139,8 @@ class Client_Handler implements Runnable // implement runnable to allow instance
       this.identity = mapper.readValue(json, Open_Request.class).identity; // set the identity of the client handler to specified identity
       subscribed_channels.add(identity); // subscribe to itself
       client_handlers.add(this); // track this client handler
-      /* TODO: send success response to client */
     }
-    catch (JsonProcessingException error) { /* TODO: send error response to client */ }
+    catch (JsonProcessingException error) { Stop(); } // if any errors occour, gracefully stop
     try
     {
       BufferedReader log = new BufferedReader(new FileReader(PATH)); // create buffered reader from file reader of specified file
@@ -177,7 +176,7 @@ class Client_Handler implements Runnable // implement runnable to allow instance
         writer.flush(); // manually flush the writer to make sure it is ready to be used again
       }
     }
-    catch (IOException error) { error.printStackTrace(); }
+    catch (IOException error) { Stop(); } // if any errors occour, gracefully stop
   }
   
   void Respond_Success() // send success response
@@ -193,7 +192,7 @@ class Client_Handler implements Runnable // implement runnable to allow instance
         writer.flush(); // manually flush the writer to make sure it is ready to be used again
       }
     }
-    catch (IOException error) { error.printStackTrace(); }
+    catch (IOException error) { Stop(); } // if any errors occour, gracefully stop
   }
 
   void Publish(String json)
@@ -229,9 +228,9 @@ class Client_Handler implements Runnable // implement runnable to allow instance
           Respond_Success(); // send success response
         }
       }
-      if (!found) { Respond_Error("NO SUCH CHANNEL: " + channel); }
+      if (!found) { Respond_Error("NO SUCH CHANNEL: " + channel); } // if no matching channel is found, respond with an error
     }
-    catch (JsonProcessingException error) { Stop(); }
+    catch (JsonProcessingException error) { Stop(); } // if any errors occour, gracefully stop
   }
 
   void Unsubscribe(String json) // unsubscribe to channel
@@ -252,7 +251,7 @@ class Client_Handler implements Runnable // implement runnable to allow instance
       }
       if (!found) { Respond_Error("NO SUCH CHANNEL: " + channel); }
     }
-    catch (IOException error) { Stop(); }
+    catch (IOException error) { Stop(); } // if any errors occour, gracefully stop
   }
 
   void Get(String json) // get messages
@@ -264,6 +263,6 @@ class Client_Handler implements Runnable // implement runnable to allow instance
         for (String string : client_handler.message_board) { System.out.println(string); } /* TODO: add to send message list response as opposed to just writing each message on the server */
       }
     }
-    Respond_Success();
+    Respond_Success(); // send success response
   }
 }
