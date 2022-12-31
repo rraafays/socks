@@ -217,14 +217,17 @@ class Client_Handler implements Runnable // implement runnable to allow instance
     try
     {
       Publish_Request publish_request = mapper.readValue(json, Publish_Request.class); // read publish request
+      boolean found = false; // boolean which is set to true once the specified channel has been found
       for (Client_Handler client_handler : client_handlers) // for each client handler in client handlers
       {
         if (client_handler.identity.equals(publish_request.identity)) // if the client handler's identity is equal to the specified publish request identity
         {
           client_handler.message_board.add(publish_request.message); // add the message specified in the publish request to their message board
+          found = true; // set found to true
+          Respond_Success(); // send success response
         }
       }
-      Respond_Success(); // send success response
+      if (!found) { Respond_Error("NO SUCH CHANNEL: " + publish_request.identity); } // if no matching channel is found, respond with an error
     }
     catch (JsonProcessingException error) { Respond_Error("MESSAGE TOO BIG"); } // if json fails to process, send error response with the message being too big to encode as the reason
   }
@@ -234,6 +237,7 @@ class Client_Handler implements Runnable // implement runnable to allow instance
     try
     {
       String channel = mapper.readValue(json, Subscribe_Request.class).channel; // make string called channel which stores the channel provided by the json string
+      if (subscribed_channels.contains(channel)) { Respond_Error("ALREADY SUBSCRIBED: " + channel); return;}; // if the specified channel is already in the subscribed channels list, send error response
 
       boolean found = false; // boolean which is set to true once the specified channel has been found
       for (Client_Handler client_handler : client_handlers) // for each client handler in client handlers
@@ -255,6 +259,7 @@ class Client_Handler implements Runnable // implement runnable to allow instance
     try
     {
       String channel = mapper.readValue(json, Unsubscribe_Request.class).channel; // make string called channel which stores the channel provided by the json string
+      if (channel.equals(this.identity)) { Respond_Error("CANNOT UNSUBSCRIBE FROM SELF"); return; } // if the specified channel is the client's own identity, send error resonse
 
       boolean found = false;
       for (Client_Handler client_handler : client_handlers) // for each client handler in client handlers
