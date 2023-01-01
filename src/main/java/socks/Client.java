@@ -9,6 +9,8 @@ import java.io.BufferedWriter;
 
 // network library
 import java.net.Socket;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -105,7 +107,7 @@ public class Client
           System.out.println // println
           (
             "[TIME] IDENTITY: MESSAGE" // template string for substituting into
-              .replaceAll("TIME", Integer.toString(message.when)) // substitute time for when
+              .replaceAll("TIME", new SimpleDateFormat("HH:mm").format(message.when)) // substitute time for when
               .replaceAll("IDENTITY", message.from) // substitute id for from
               .replaceAll("MESSAGE", message.body) // substitute message for body
           ); // print the string post substitution
@@ -128,7 +130,7 @@ public class Client
     publish_request.message = new Message(); // create new message
     publish_request.message._class = "Message"; // set the _class
     publish_request.message.from = this.identity; // set from to identity
-    publish_request.message.when = 0; // FIXME: set current time as opposed to just 0
+    publish_request.message.when = System.currentTimeMillis(); // set when to the current time in milliseconds
     publish_request.message.body = message; // set body
 
     try 
