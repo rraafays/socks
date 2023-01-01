@@ -97,12 +97,18 @@ public class Client
       String _class = mapper.readValue(json, Mask.class)._class; // isolate the _class attribute by masking the json string using mask object
       if (_class.equals("SuccessResponse")) { System.out.println("\u001B[32mRequest succeeded!\u001B[0m"); } // if the _class is success response, tell user request succeeded
       if (_class.equals("ErrorResponse")) { System.out.println("\u001B[31m" + mapper.readValue(json, Error_Response.class).error + "\u001B[0m"); } // if the _class is error response, tell user reason
-      if (_class.equals("MessageListResponse"))
+      if (_class.equals("MessageListResponse")) // if the class is message list response
       {  
-        Message_List_Response message_list_response = mapper.readValue(json, Message_List_Response.class);
-        for (Message message : message_list_response.messages)
+        Message_List_Response message_list_response = mapper.readValue(json, Message_List_Response.class); // read respnse into message list response object
+        for (Message message : message_list_response.messages) // for each message in message list
         {
-          System.out.println(message.from + ':' + ' ' + message.body);
+          System.out.println // println
+          (
+            "[TIME] IDENTITY: MESSAGE" // template string for substituting into
+              .replaceAll("TIME", Integer.toString(message.when)) // substitute time for when
+              .replaceAll("IDENTITY", message.from) // substitute id for from
+              .replaceAll("MESSAGE", message.body) // substitute message for body
+          ); // print the string post substitution
         }
       }
     }
