@@ -283,7 +283,11 @@ class Client_Handler implements Runnable // implement runnable to allow instance
     {
       if (subscribed_channels.contains(client_handler.identity)) // if subscribed to the channel
       {
-        for (Message message : client_handler.message_board) { messages.add(message); }
+        for (Message message : client_handler.message_board) 
+        { 
+          try { if (message.when > mapper.readValue(json, Get_Request.class).after) { messages.add(message); } } // try to get every message after the time given
+          catch (JsonProcessingException error) { Respond_Error("INVALID TIME"); } // if any errors occour, send error response
+        }
       }
     }
     Respond_MessageList(messages);
