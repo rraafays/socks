@@ -23,7 +23,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 @JsonIgnoreProperties(ignoreUnknown = true)
 class Mask { public String _class; public String identity; } // E.G: if (mask._class.equals("OpenRequest")) { Add_Channel(request_json, client_handler); }
 // objects to map json sent by the client into
-class Message { public String _class; public String from; public int when; public String body; }
+class Message { public String _class; public String from; public long when; public String body; }
 class Open_Request { public String _class; public String identity; }
 class Publish_Request { public String _class; public String identity; public Message message; }
 class Subscribe_Request { public String _class; public String identity; public String channel; }
