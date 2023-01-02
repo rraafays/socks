@@ -77,7 +77,7 @@ public class Client
 
   static void ShowMenu() // print options menu
   {
-    System.out.println("[1] \u001B[35mPublish\u001B[0m, [2] \u001B[34mSubscribe\u001B[0m, [3] \u001B[31mUnsubscribe\u001B[0m, [4] \u001B[33mGet Messages\u001B[0m");
+    System.out.println("\n[1] \u001B[35mPublish\u001B[0m, [2] \u001B[34mSubscribe\u001B[0m, [3] \u001B[31mUnsubscribe\u001B[0m, [4] \u001B[33mGet Messages\u001B[0m");
   }
 
   void Stop() // stop the client

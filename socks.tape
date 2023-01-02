@@ -26,4 +26,4 @@ Sleep 500ms
 Enter
 Sleep 500ms
 
-Sleep 20s
+Sleep 30s
