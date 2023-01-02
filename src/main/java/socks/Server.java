@@ -1,5 +1,17 @@
 package socks;
 
+// utility library
+import java.util.ArrayList;
+
+// network library
+import java.net.ServerSocket;
+import java.net.Socket;
+
+// jackson library
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 // input output library
 import java.io.IOException;
 import java.io.BufferedReader;
@@ -8,16 +20,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-
-// network library
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-
-// jackson library
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 // object used to mask json strings to determine their _class attribute
 @JsonIgnoreProperties(ignoreUnknown = true)

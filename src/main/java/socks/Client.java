@@ -1,22 +1,25 @@
 package socks;
 
+// network library
+import java.net.Socket;
+
+// jackson library
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+// utility library
+import java.util.ArrayList;
+import java.util.Scanner;
+
+// text library
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 // input output library
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-
-// network library
-import java.net.Socket;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Scanner;
-
-// jackson library
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 // objects to map json sent by the server into
 class Success_Response { public String _class; }
