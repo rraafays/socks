@@ -12,6 +12,9 @@ wrapper: # build wrapper files into binaries
 	gcc server_wrapper.c -o server
 	gcc client_wrapper.c -o client
 
+tape: # build the tape file using vhs
+	vhs < socks.tape
+
 deps: # list all dependencies that my project uses
 	./gradlew dependencies
 
