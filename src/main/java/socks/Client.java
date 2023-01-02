@@ -186,7 +186,7 @@ public class Client
     Get_Request get_request = new Get_Request(); // create get request object
     get_request._class = "GetRequest"; // set the _class
     get_request.identity = this.identity; // set identity
-    System.out.println("\u001B[33mAfter what date would you like messages from? E.G: 01:01:2023\u001B[0m"); // prompt the user for a date
+    System.out.println("\u001B[33mAfter what date would you like messages from? E.G: 01/01/2023 10:30\u001B[0m"); // prompt the user for a date
     try { get_request.after = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(scanner.nextLine()).getTime(); } // set after to the time in milliseconds between 1970 and their date
     catch (ParseException error) { get_request.after = 0; } // if an error occours, set after to 0 to receive all messages
 
