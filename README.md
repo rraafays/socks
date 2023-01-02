@@ -13,6 +13,8 @@ Multithreaded client server socket chat app written in Java which uses json prot
 4. in case of get, server responds with messagelist otherwise server responds with success or error
 5. loop 3
 
+<img alt="socks demo" src="https://raafay.world/images/projects/socks.gif" width="1920" />
+
 ## Getting started
 First build socks:
 ```sh
