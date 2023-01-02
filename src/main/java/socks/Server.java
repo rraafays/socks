@@ -28,7 +28,7 @@ class Open_Request { public String _class; public String identity; }
 class Publish_Request { public String _class; public String identity; public Message message; }
 class Subscribe_Request { public String _class; public String identity; public String channel; }
 class Unsubscribe_Request { public String _class; public String identity; public String channel; }
-class Get_Request { public String _class; public String identity; public int after; }
+class Get_Request { public String _class; public String identity; public long after; }
 
 public class Server
 {
