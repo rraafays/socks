@@ -9,9 +9,10 @@ import java.io.BufferedWriter;
 
 // network library
 import java.net.Socket;
-import java.sql.Date;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Scanner;
 
 // jackson library
@@ -185,7 +186,9 @@ public class Client
     Get_Request get_request = new Get_Request(); // create get request object
     get_request._class = "GetRequest"; // set the _class
     get_request.identity = this.identity; // set identity
-    get_request.after = 0; // FIXME: set current time as opposed to just 0
+    System.out.println("\u001B[33mAfter what date would you like messages from? E.G: 01:01:2023\u001B[0m"); // prompt the user for a date
+    try { get_request.after = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(scanner.nextLine()).getTime(); } // set after to the time in milliseconds between 1970 and their date
+    catch (ParseException error) { get_request.after = 0; } // if an error occours, set after to 0 to receive all messages
 
     try 
     { 
