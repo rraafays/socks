@@ -2,8 +2,7 @@ default: clean build wrapper # cleans then builds java program and c wrappers
 
 clean: # clean files using gradle wrapper
 	./gradlew clean -q
-	rm -f server
-	rm -f client
+	rm -f client server
 
 build: # build into an uberjar that includes deps
 	./gradlew shadowJar
