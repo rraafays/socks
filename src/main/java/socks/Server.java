@@ -125,7 +125,10 @@ class Client_Handler implements Runnable {
         while (socket.isConnected()) {
             try {
                 json = reader.readLine(); 
-                if (json == null) { Stop(); break; } 
+                if (json == null) { 
+                    Stop(); 
+                    break; 
+                } 
 
                 BufferedWriter log = new BufferedWriter(new FileWriter(PATH, true)); 
                 String _class = mapper.readValue(json, Mask.class)._class; 
@@ -336,7 +339,7 @@ class Client_Handler implements Runnable {
                         if (message.when > mapper.readValue(json, Get_Request.class).after) { 
                             messages.add(message); 
                         } 
-                    } 
+                } 
                 catch (JsonProcessingException error) { 
                         Respond_Error("INVALID TIME"); 
                     } 

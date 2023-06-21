@@ -136,9 +136,9 @@ public class Client {
                 for (Message message : message_list_response.messages) {
                     System.out.println (
                         "[TIME] IDENTITY: MESSAGE" 
-                        .replaceAll("TIME", new SimpleDateFormat("HH:mm").format(message.when)) 
-                        .replaceAll("IDENTITY", message.from) 
-                        .replaceAll("MESSAGE", message.body) 
+                            .replaceAll("TIME", new SimpleDateFormat("HH:mm").format(message.when)) 
+                            .replaceAll("IDENTITY", message.from) 
+                            .replaceAll("MESSAGE", message.body) 
                     ); 
                 }
             }
@@ -217,8 +217,14 @@ public class Client {
         get_request._class = "GetRequest"; 
         get_request.identity = this.identity; 
         System.out.println("\u001B[33mAfter what date would you like messages from? E.G: 01/01/2023 10:30\u001B[0m"); 
-        try { get_request.after = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(scanner.nextLine()).getTime(); } 
-        catch (ParseException error) { get_request.after = 0; } 
+        try { 
+            get_request.after = new SimpleDateFormat("dd/MM/yyyy HH:mm")
+                .parse(scanner.nextLine())
+                .getTime(); 
+        } 
+        catch (ParseException error) { 
+            get_request.after = 0; 
+        } 
 
         try { 
             this.writer.write(mapper.writeValueAsString(get_request)); 
