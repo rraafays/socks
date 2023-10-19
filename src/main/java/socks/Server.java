@@ -3,6 +3,7 @@ package socks;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -101,7 +102,6 @@ public class Server
             while (!server_socket.isClosed())
             {
                 Socket socket = server_socket.accept();
-
                 Client_Handler client_handler = new Client_Handler(socket);
                 Thread thread = new Thread(client_handler);
                 thread.start();
@@ -179,10 +179,8 @@ class Client_Handler implements Runnable
                     Stop();
                     break;
                 }
-
                 BufferedWriter log = new BufferedWriter(new FileWriter(PATH, true));
                 String _class = mapper.readValue(json, Mask.class)._class;
-
                 if (_class.equals("OpenRequest"))
                 {
                     Open(json);
@@ -203,7 +201,6 @@ class Client_Handler implements Runnable
                 {
                     Get(json);
                 }
-
                 log.append(json + "\n");
                 log.close();
             }
@@ -380,7 +377,6 @@ class Client_Handler implements Runnable
                 return;
             }
             ;
-
             boolean found = false;
             for (Client_Handler client_handler : client_handlers)
             {
@@ -412,7 +408,6 @@ class Client_Handler implements Runnable
                 Respond_Error("CANNOT UNSUBSCRIBE FROM SELF");
                 return;
             }
-
             boolean found = false;
             for (Client_Handler client_handler : client_handlers)
             {

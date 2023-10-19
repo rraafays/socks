@@ -1,6 +1,7 @@
 package socks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -72,18 +73,15 @@ public class Client
             System.out.println("Enter identity: ");
             String identity = scanner.nextLine();
             Client client = new Client(socket, identity);
-
             Open_Request open_request = new Open_Request();
             open_request._class = "OpenRequest";
             open_request.identity = identity;
             client.writer.write(mapper.writeValueAsString(open_request));
             client.writer.newLine();
             client.writer.flush();
-
             while (true)
             {
                 ShowMenu();
-
                 String option = scanner.nextLine();
                 if (option.equals("1"))
                 {
@@ -177,7 +175,6 @@ public class Client
         String channel = scanner.nextLine();
         System.out.println("\u001B[35mWhat would you like to say? \u001B[0m");
         String message = scanner.nextLine();
-
         Publish_Request publish_request = new Publish_Request();
         publish_request._class = "PublishRequest";
         publish_request.identity = channel;
@@ -186,7 +183,6 @@ public class Client
         publish_request.message.from = this.identity;
         publish_request.message.when = System.currentTimeMillis();
         publish_request.message.body = message;
-
         try
         {
             this.writer.write(mapper.writeValueAsString(publish_request));
@@ -203,12 +199,10 @@ public class Client
     {
         System.out.println("\u001B[34mWho would you like to subscribe to? \u001B[0m");
         String channel = scanner.nextLine();
-
         Subscribe_Request subscribe_request = new Subscribe_Request();
         subscribe_request._class = "SubscribeRequest";
         subscribe_request.identity = this.identity;
         subscribe_request.channel = channel;
-
         try
         {
             this.writer.write(mapper.writeValueAsString(subscribe_request));
@@ -225,12 +219,10 @@ public class Client
     {
         System.out.println("\u001B[31mWho would you like to unsubscribe from? \u001B[0m");
         String channel = scanner.nextLine();
-
         Unsubscribe_Request unsubscribe_request = new Unsubscribe_Request();
         unsubscribe_request._class = "UnsubscribeRequest";
         unsubscribe_request.identity = this.identity;
         unsubscribe_request.channel = channel;
-
         try
         {
             this.writer.write(mapper.writeValueAsString(unsubscribe_request));
@@ -257,7 +249,6 @@ public class Client
         {
             get_request.after = 0;
         }
-
         try
         {
             this.writer.write(mapper.writeValueAsString(get_request));
