@@ -10,3 +10,5 @@ client
 # program files
 log
 socks.gif
+# lsp
+bin/*
