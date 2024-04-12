@@ -12,3 +12,4 @@ log
 socks.gif
 # lsp
 bin/*
+.envrc
